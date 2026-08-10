@@ -19,29 +19,24 @@ def signup():
 
     if request.method == "POST":
         username = request.form.get("username", "").strip()
-        email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
         confirm = request.form.get("confirm_password", "")
 
         errors = []
         if not username:
             errors.append("Username is required.")
-        if not email:
-            errors.append("Email is required.")
         if len(password) < 6:
             errors.append("Password must be at least 6 characters.")
         if password != confirm:
             errors.append("Passwords do not match.")
         if User.query.filter_by(username=username).first():
             errors.append("Username is already taken.")
-        if User.query.filter_by(email=email).first():
-            errors.append("Email is already registered.")
 
         if errors:
             for e in errors:
                 flash(e, "error")
         else:
-            user = User(username=username, email=email)
+            user = User(username=username)
             user.set_password(password)
             db.session.add(user)
             db.session.commit()

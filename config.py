@@ -1,10 +1,14 @@
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
 def _fix_db_url(url):
-    """Supabase gives postgres:// but SQLAlchemy 1.4+ requires postgresql://."""
+    """Supabase gives postgres:// but SQLAlchemy requires a specific dialect."""
     if url and url.startswith("postgres://"):
-        url = url.replace("postgres://", "postgresql://", 1)
+        url = url.replace("postgres://", "postgresql+pg8000://", 1)
+    elif url and url.startswith("postgresql://"):
+        url = url.replace("postgresql://", "postgresql+pg8000://", 1)
     return url
 
 
