@@ -61,6 +61,29 @@ http://localhost:5000/api/trigger-reminder?token=YOUR_REMINDER_TRIGGER_TOKEN
    redeploy. Fine for active development; if you want this to be
    bulletproof long-term, we can move to a hosted database later.
 
+## Deployment (Vercel)
+
+1. Push this folder to a GitHub repo.
+2. In the Vercel dashboard, create a new project from that repo.
+3. Vercel will detect Python and install `requirements.txt`.
+4. Add these environment variables in Vercel's Project Settings:
+   - `SECRET_KEY`
+   - `DATABASE_URL` (recommended: remote database, not local SQLite)
+   - `REMINDER_EMAIL`
+   - `SMTP_HOST`
+   - `SMTP_PORT`
+   - `SMTP_USERNAME`
+   - `SMTP_PASSWORD`
+   - `REMINDER_TRIGGER_TOKEN`
+   - `ENABLE_INPROCESS_SCHEDULER=false`
+5. Because Vercel uses ephemeral serverless execution, do not rely on the
+   local SQLite file for production persistence. Use a hosted database
+   provider and point `DATABASE_URL` to it.
+6. To trigger reminders from an external scheduler, use:
+   `https://your-app.vercel.app/api/trigger-reminder?token=YOUR_REMINDER_TRIGGER_TOKEN`
+
+> Note: `vercel.json` is included to route all requests to `app.py`.
+
 ## Next phases
 
 This covers Phase 1 (Foundation) from the PRD. Everything is functional —
