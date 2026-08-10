@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,23 +7,32 @@
   <title>{% block title %}Task Manager{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body class="theme-light">
+<body>
   {% if current_user.is_authenticated %}
-  <nav class="navbar">
-    <div class="nav-links">
+  <header class="navbar app-header">
+    <div class="nav-brand">
+      <svg class="nav-brand-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square">
+        <rect x="3" y="3" width="7" height="7"/>
+        <rect x="14" y="3" width="7" height="7"/>
+        <rect x="3" y="14" width="7" height="7"/>
+        <rect x="14" y="14" width="7" height="7"/>
+      </svg>
+      <span class="nav-brand-text">TaskManager</span>
+    </div>
+    <nav class="nav-links">
       <a href="{{ url_for('daily.index') }}" {% if request.path == '/' %}class="active"{% endif %}>Daily</a>
       <a href="{{ url_for('periodic.index') }}" {% if '/periodic' in request.path %}class="active"{% endif %}>Periodic</a>
       <a href="{{ url_for('history.index') }}" {% if '/history' in request.path %}class="active"{% endif %}>History</a>
       <a href="{{ url_for('codes.index') }}" {% if '/codes' in request.path %}class="active"{% endif %}>Codes</a>
-    </div>
+    </nav>
     <div class="nav-user">
-      <a href="{{ url_for('profile.index') }}" class="username" style="text-decoration: none;">signed in as <span>{{ current_user.username }}</span></a>
+      <a href="{{ url_for('profile.index') }}" class="username">signed in as <span>{{ current_user.username }}</span></a>
       <a href="{{ url_for('auth.logout') }}" class="logout">Log out</a>
     </div>
-  </nav>
+  </header>
   {% endif %}
 
   <main class="container">
