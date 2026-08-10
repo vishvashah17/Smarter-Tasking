@@ -56,20 +56,6 @@
   </div>
 </div>
 
-<!-- Reminder Email -->
-<div class="profile-section">
-  <div class="profile-section-title"><span class="icon">📧</span> Reminder Email</div>
-  <form method="POST" action="{{ url_for('profile.update_email') }}" class="profile-form">
-    <label>Reminder Email Address
-      <input type="email" name="reminder_email" value="{{ reminder_email }}" placeholder="your@email.com" required>
-    </label>
-    <p style="font-size: 12px; color: var(--text-dim); margin-top: -4px;">
-      Task reminders and new-task notifications will be sent to this address.
-    </p>
-    <button type="submit" class="btn-primary">Update email</button>
-  </form>
-</div>
-
 <!-- Change Password -->
 <div class="profile-section">
   <div class="profile-section-title"><span class="icon">🔒</span> Change Password</div>

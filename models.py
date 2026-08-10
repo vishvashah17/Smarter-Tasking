@@ -59,8 +59,6 @@ class Task(db.Model):
     # Periodic-only fields
     deadline = db.Column(db.DateTime, nullable=True)
     recurrence = db.Column(db.String(10), nullable=True)  # none | daily | weekly | monthly | custom
-    recurrence_interval_days = db.Column(db.Integer, nullable=True)  # used when recurrence == 'custom'
-    last_reminded_date = db.Column(db.Date, nullable=True)  # prevents duplicate reminder emails same day
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

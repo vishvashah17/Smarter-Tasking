@@ -17,10 +17,7 @@ def index():
         "code_snippets": CodeSnippet.query.filter_by(user_id=current_user.id).count(),
     }
 
-    # The reminder email is the user's own email
-    reminder_email = current_user.email
-
-    return render_template("profile.html", stats=stats, reminder_email=reminder_email)
+    return render_template("profile.html", stats=stats)
 
 
 @bp.route("/profile/change-password", methods=["POST"])
@@ -47,24 +44,3 @@ def change_password():
     flash("Password changed successfully!", "success")
     return redirect(url_for("profile.index"))
 
-
-@bp.route("/profile/update-email", methods=["POST"])
-@login_required
-def update_email():
-    new_email = request.form.get("reminder_email", "").strip().lower()
-
-    if not new_email:
-        flash("Email cannot be empty.", "error")
-        return redirect(url_for("profile.index"))
-
-    # Check if email is already taken by another user
-    from models import User
-    existing = User.query.filter(User.email == new_email, User.id != current_user.id).first()
-    if existing:
-        flash("That email is already registered to another account.", "error")
-        return redirect(url_for("profile.index"))
-
-    current_user.email = new_email
-    db.session.commit()
-    flash("Reminder email updated successfully!", "success")
-    return redirect(url_for("profile.index"))
