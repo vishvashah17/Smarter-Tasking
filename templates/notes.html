@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}Notes{% endblock %}
+{% block container_class %}container-grid{% endblock %}
+{% block content %}
+<h1>Notes</h1>
+
+<button class="fab" onclick="openCreateModal()" title="New Note">+</button>
+
+<div class="modal-overlay" id="create-modal">
+  <div class="modal-content">
+    <h2>New Note</h2>
+    <form method="POST" action="{{ url_for('notes.create') }}">
+      <label>Title
+        <input type="text" name="title" placeholder="Note title" required>
+      </label>
+      <label>Content
+        <textarea name="content" placeholder="Write your note..." required></textarea>
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="closeCreateModal()">Cancel</button>
+        <button type="submit" class="btn-primary">Save note</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if notes %}
+<div class="item-grid">
+  {% for note in notes %}
+  <article class="grid-card grid-card-note" tabindex="0" role="button"
+           data-item='{{ {"id": note.id, "title": note.title, "content": note.content, "created": note.created_at.strftime("%Y-%m-%d"), "updated": note.updated_at.strftime("%Y-%m-%d"), "type": "note"}|tojson }}'
+           onclick="openViewModal(this)"
+           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openViewModal(this);}">
+    <h3 class="grid-card-title">{{ note.title }}</h3>
+    <p class="grid-card-preview">{{ note.content[:140] }}{% if note.content|length > 140 %}…{% endif %}</p>
+    <div class="grid-card-meta">{{ note.updated_at.strftime('%Y-%m-%d') }}</div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">No notes yet — create one with the + button.</div>
+{% endif %}
+
+<div class="modal-overlay" id="view-modal">
+  <div class="modal-content modal-content-wide">
+    <div class="view-modal-header">
+      <h2 id="view-title"></h2>
+      <div class="view-modal-actions">
+        <button type="button" class="view-action-btn" id="view-edit-btn" title="Edit">✎</button>
+        <form method="POST" id="view-delete-form" class="inline-form">
+          <button type="submit" class="view-action-btn view-action-delete" title="Delete"
+                  onclick="return confirm('Delete this note?')">✕</button>
+        </form>
+      </div>
+    </div>
+    <div class="view-modal-meta" id="view-meta"></div>
+    <div class="view-modal-body" id="view-body"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn-cancel" onclick="closeViewModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal-content">
+    <h2>Edit Note</h2>
+    <form method="POST" id="edit-form">
+      <label>Title
+        <input type="text" name="title" id="edit-title" required>
+      </label>
+      <label>Content
+        <textarea name="content" id="edit-content" required></textarea>
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+        <button type="submit" class="btn-primary">Save changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+var currentItem = null;
+
+function openViewModal(el) {
+  currentItem = JSON.parse(el.getAttribute('data-item'));
+  document.getElementById('view-title').textContent = currentItem.title;
+  document.getElementById('view-meta').textContent =
+    'Updated ' + currentItem.updated +
+    (currentItem.created !== currentItem.updated ? ' · Created ' + currentItem.created : '');
+  document.getElementById('view-body').textContent = currentItem.content;
+  document.getElementById('view-delete-form').action = '/notes/' + currentItem.id + '/delete';
+  document.getElementById('view-modal').classList.add('active');
+}
+
+function closeViewModal() {
+  document.getElementById('view-modal').classList.remove('active');
+  currentItem = null;
+}
+
+function openEditModal() {
+  if (!currentItem) return;
+  document.getElementById('edit-title').value = currentItem.title;
+  document.getElementById('edit-content').value = currentItem.content;
+  document.getElementById('edit-form').action = '/notes/' + currentItem.id + '/update';
+  closeViewModal();
+  document.getElementById('edit-modal').classList.add('active');
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('active');
+}
+
+function openCreateModal() {
+  document.getElementById('create-modal').classList.add('active');
+}
+
+function closeCreateModal() {
+  document.getElementById('create-modal').classList.remove('active');
+}
+
+document.getElementById('view-edit-btn').addEventListener('click', openEditModal);
+
+['view-modal', 'edit-modal', 'create-modal'].forEach(function(id) {
+  document.getElementById(id).addEventListener('click', function(e) {
+    if (e.target === this) {
+      if (id === 'view-modal') closeViewModal();
+      if (id === 'edit-modal') closeEditModal();
+      if (id === 'create-modal') closeCreateModal();
+    }
+  });
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeViewModal();
+    closeEditModal();
+    closeCreateModal();
+  }
+});
+</script>
+{% endblock %}

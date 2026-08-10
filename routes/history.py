@@ -22,6 +22,13 @@ def index():
         query = query.filter_by(status=status_filter)
 
     tasks = query.order_by(Task.updated_at.desc()).all()
+    daily_tasks = [t for t in tasks if t.type == "daily"]
+    periodic_tasks = [t for t in tasks if t.type == "periodic"]
     return render_template(
-        "history.html", tasks=tasks, type_filter=type_filter, status_filter=status_filter
+        "history.html",
+        tasks=tasks,
+        daily_tasks=daily_tasks,
+        periodic_tasks=periodic_tasks,
+        type_filter=type_filter,
+        status_filter=status_filter,
     )

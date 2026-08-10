@@ -1,6 +1,31 @@
 {% extends "base.html" %}
 {% block title %}History{% endblock %}
+{% block container_class %}container-grid{% endblock %}
 {% block content %}
+
+{% macro history_task_item(task, index) %}
+<li class="task-item history-item status-{{ task.status }}" style="animation-delay: {{ index * 0.04 }}s">
+  <div class="history-status-indicator">
+    {% if task.status == 'completed' %}
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="20 6 9 17 4 12"/></svg>
+    {% else %}
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    {% endif %}
+  </div>
+  <div class="task-body">
+    <div class="task-title">{{ task.title }}</div>
+    <div class="task-meta">
+      <span class="status-badge {{ task.status }}">
+        {{ 'Completed' if task.status == 'completed' else 'Missed' }}
+      </span>
+      {% if task.completed_at %}
+        <span class="meta-dot">·</span>
+        <span class="history-date">{{ task.completed_at.strftime('%b %d, %Y') }}</span>
+      {% endif %}
+    </div>
+  </div>
+</li>
+{% endmacro %}
 
 <div class="history-page">
   <div class="history-header">
@@ -9,7 +34,7 @@
   </div>
 
   <div class="history-toolbar">
-    <form method="GET" class="filter-form" id="history-filters">
+    <form method="GET" class="filter-form history-filter-form" id="history-filters">
       <div class="filter-group">
         <label class="filter-label" for="type-filter">TYPE</label>
         <select name="type" id="type-filter" onchange="this.form.submit()">
@@ -44,41 +69,35 @@
     </div>
   </div>
 
-  <ul class="task-list history-list">
-    {% for task in tasks %}
-    <li class="task-item history-item status-{{ task.status }}" style="animation-delay: {{ loop.index0 * 0.04 }}s">
-      <div class="history-status-indicator">
-        {% if task.status == 'completed' %}
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="20 6 9 17 4 12"/></svg>
+  <div class="history-columns">
+    <section class="history-column history-column-daily">
+      <h2 class="history-column-title">Daily</h2>
+      <ul class="task-list history-list">
+        {% for task in daily_tasks %}
+          {{ history_task_item(task, loop.index0) }}
         {% else %}
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        {% endif %}
-      </div>
-      <div class="task-body">
-        <div class="task-title">{{ task.title }}</div>
-        <div class="task-meta">
-          <span class="type-badge">{{ task.type }}</span>
-          <span class="meta-dot">·</span>
-          <span class="status-badge {{ task.status }}">
-            {{ 'Completed' if task.status == 'completed' else 'Missed' }}
-          </span>
-          {% if task.completed_at %}
-            <span class="meta-dot">·</span>
-            <span class="history-date">{{ task.completed_at.strftime('%b %d, %Y') }}</span>
-          {% endif %}
-        </div>
-      </div>
-    </li>
-    {% else %}
-    <li class="empty-state">
-      <div class="empty-icon">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
-      </div>
-      <p>No history yet</p>
-      <span class="empty-hint">Complete or miss tasks to see them here</span>
-    </li>
-    {% endfor %}
-  </ul>
+        <li class="empty-state history-empty">
+          <p>No daily history</p>
+          <span class="empty-hint">Completed daily tasks appear here</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <section class="history-column history-column-periodic">
+      <h2 class="history-column-title">Periodic</h2>
+      <ul class="task-list history-list">
+        {% for task in periodic_tasks %}
+          {{ history_task_item(task, loop.index0) }}
+        {% else %}
+        <li class="empty-state history-empty">
+          <p>No periodic history</p>
+          <span class="empty-hint">Completed periodic tasks appear here</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
 </div>
 
 {% endblock %}

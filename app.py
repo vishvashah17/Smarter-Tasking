@@ -16,6 +16,7 @@ def create_app():
     from routes.periodic import bp as periodic_bp
     from routes.history import bp as history_bp
     from routes.codes import bp as codes_bp
+    from routes.notes import bp as notes_bp
     from routes.profile import bp as profile_bp
 
     app.register_blueprint(auth_bp)
@@ -23,6 +24,7 @@ def create_app():
     app.register_blueprint(periodic_bp)
     app.register_blueprint(history_bp)
     app.register_blueprint(codes_bp)
+    app.register_blueprint(notes_bp)
     app.register_blueprint(profile_bp)
 
     with app.app_context():

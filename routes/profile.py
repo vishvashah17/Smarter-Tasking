@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 
 from extensions import db
-from models import Task, CodeSnippet
+from models import Task, CodeSnippet, Note
 
 bp = Blueprint("profile", __name__)
 
@@ -15,6 +15,7 @@ def index():
         "active_tasks": Task.query.filter_by(user_id=current_user.id, status="active").count(),
         "completed_tasks": Task.query.filter_by(user_id=current_user.id, status="completed").count(),
         "code_snippets": CodeSnippet.query.filter_by(user_id=current_user.id).count(),
+        "notes": Note.query.filter_by(user_id=current_user.id).count(),
     }
 
     return render_template("profile.html", stats=stats)

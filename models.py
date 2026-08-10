@@ -26,6 +26,7 @@ class User(UserMixin, db.Model):
     # Relationships
     tasks = db.relationship("Task", backref="owner", lazy="dynamic", cascade="all, delete-orphan")
     code_snippets = db.relationship("CodeSnippet", backref="owner", lazy="dynamic", cascade="all, delete-orphan")
+    notes = db.relationship("Note", backref="owner", lazy="dynamic", cascade="all, delete-orphan")
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -84,3 +85,20 @@ class CodeSnippet(db.Model):
 
     def __repr__(self):
         return f"<CodeSnippet {self.id} {self.title!r}>"
+
+
+class Note(db.Model):
+    """Stores text notes created by the user."""
+
+    __tablename__ = "notes"
+
+    id = db.Column(db.String(36), primary_key=True, default=gen_id)
+    user_id = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    content = db.Column(db.Text, nullable=False, default="")
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<Note {self.id} {self.title!r}>"

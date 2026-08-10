@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Code Snippets{% endblock %}
+{% block container_class %}container-grid{% endblock %}
 {% block content %}
 <h1>Code Snippets</h1>
 
@@ -8,12 +9,12 @@
 <div class="modal-overlay" id="create-modal">
   <div class="modal-content">
     <h2>New Snippet</h2>
-    <form method="POST" action="{{ url_for('codes.create') }}" id="code-create-form">
+    <form method="POST" action="{{ url_for('codes.create') }}">
       <label>Title
-        <input type="text" name="title" id="code-title" placeholder="Snippet title" required>
+        <input type="text" name="title" placeholder="Snippet title" required>
       </label>
       <label>Language
-        <select name="language" id="code-language">
+        <select name="language">
           <option value="python">Python</option>
           <option value="javascript">JavaScript</option>
           <option value="java">Java</option>
@@ -30,52 +31,59 @@
         </select>
       </label>
       <label>Code
-        <textarea name="code" id="code-content" placeholder="Paste or write your code here..." required></textarea>
+        <textarea name="code" placeholder="Paste or write your code here..." required></textarea>
       </label>
       <div class="modal-actions">
         <button type="button" class="btn-cancel" onclick="closeCreateModal()">Cancel</button>
-        <button type="submit" class="btn-primary" id="code-submit">Save snippet</button>
+        <button type="submit" class="btn-primary">Save snippet</button>
       </div>
     </form>
   </div>
 </div>
 
-<div class="snippet-list">
+{% if snippets %}
+<div class="item-grid">
   {% for snippet in snippets %}
-  <div class="snippet-card" id="snippet-{{ snippet.id }}">
-    <div class="snippet-header">
-      <div class="snippet-info">
-        <div class="snippet-title">{{ snippet.title }}</div>
-        <div class="snippet-meta">
-          <span class="snippet-lang lang-{{ snippet.language or 'other' }}">{{ snippet.language or 'code' }}</span>
-          <span>Created {{ snippet.created_at.strftime('%Y-%m-%d') }}</span>
-          {% if snippet.updated_at != snippet.created_at %}
-            <span>· Updated {{ snippet.updated_at.strftime('%Y-%m-%d') }}</span>
-          {% endif %}
-        </div>
-      </div>
-      <div class="snippet-actions">
-        <button type="button" class="edit-btn" title="Edit"
-                data-snippet='{{ {"id": snippet.id, "title": snippet.title, "code": snippet.code, "language": snippet.language or "python"}|tojson }}'
-                onclick="openEditModal(this)">
-          ✎
-        </button>
-        <form method="POST" action="{{ url_for('codes.delete', snippet_id=snippet.id) }}" class="inline-form snippet-delete-form">
-          <button type="submit" class="delete-btn" title="Delete"
+  <article class="grid-card grid-card-code" tabindex="0" role="button"
+           data-item='{{ {"id": snippet.id, "title": snippet.title, "code": snippet.code, "language": snippet.language or "python", "created": snippet.created_at.strftime("%Y-%m-%d"), "updated": snippet.updated_at.strftime("%Y-%m-%d"), "type": "code"}|tojson }}'
+           onclick="openViewModal(this)"
+           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openViewModal(this);}">
+    <div class="grid-card-top">
+      <h3 class="grid-card-title">{{ snippet.title }}</h3>
+      <span class="snippet-lang lang-{{ snippet.language or 'other' }}">{{ snippet.language or 'code' }}</span>
+    </div>
+    <pre class="grid-card-preview grid-card-preview-code">{{ snippet.code[:100] }}{% if snippet.code|length > 100 %}…{% endif %}</pre>
+    <div class="grid-card-meta">{{ snippet.updated_at.strftime('%Y-%m-%d') }}</div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">No code snippets yet — create one with the + button.</div>
+{% endif %}
+
+<div class="modal-overlay" id="view-modal">
+  <div class="modal-content modal-content-wide">
+    <div class="view-modal-header">
+      <h2 id="view-title"></h2>
+      <div class="view-modal-actions">
+        <span class="snippet-lang" id="view-lang"></span>
+        <button type="button" class="view-action-btn" id="view-edit-btn" title="Edit">✎</button>
+        <form method="POST" id="view-delete-form" class="inline-form">
+          <button type="submit" class="view-action-btn view-action-delete" title="Delete"
                   onclick="return confirm('Delete this snippet?')">✕</button>
         </form>
       </div>
     </div>
-    <div class="snippet-code">
-      <pre><code>{{ snippet.code }}</code></pre>
+    <div class="view-modal-meta" id="view-meta"></div>
+    <div class="view-modal-body view-modal-body-code">
+      <pre><code id="view-body"></code></pre>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn-cancel" onclick="closeViewModal()">Close</button>
     </div>
   </div>
-  {% else %}
-  <div class="empty-state">No code snippets yet — create one above.</div>
-  {% endfor %}
 </div>
 
-<!-- Edit Modal -->
 <div class="modal-overlay" id="edit-modal">
   <div class="modal-content">
     <h2>Edit Snippet</h2>
@@ -112,12 +120,34 @@
 </div>
 
 <script>
-function openEditModal(btn) {
-  var data = JSON.parse(btn.getAttribute('data-snippet'));
-  document.getElementById('edit-title').value = data.title;
-  document.getElementById('edit-code').value = data.code;
-  document.getElementById('edit-language').value = data.language;
-  document.getElementById('edit-form').action = '/codes/' + data.id + '/update';
+var currentItem = null;
+
+function openViewModal(el) {
+  currentItem = JSON.parse(el.getAttribute('data-item'));
+  document.getElementById('view-title').textContent = currentItem.title;
+  var langEl = document.getElementById('view-lang');
+  langEl.textContent = currentItem.language;
+  langEl.className = 'snippet-lang lang-' + currentItem.language;
+  document.getElementById('view-meta').textContent =
+    'Updated ' + currentItem.updated +
+    (currentItem.created !== currentItem.updated ? ' · Created ' + currentItem.created : '');
+  document.getElementById('view-body').textContent = currentItem.code;
+  document.getElementById('view-delete-form').action = '/codes/' + currentItem.id + '/delete';
+  document.getElementById('view-modal').classList.add('active');
+}
+
+function closeViewModal() {
+  document.getElementById('view-modal').classList.remove('active');
+  currentItem = null;
+}
+
+function openEditModal() {
+  if (!currentItem) return;
+  document.getElementById('edit-title').value = currentItem.title;
+  document.getElementById('edit-code').value = currentItem.code;
+  document.getElementById('edit-language').value = currentItem.language;
+  document.getElementById('edit-form').action = '/codes/' + currentItem.id + '/update';
+  closeViewModal();
   document.getElementById('edit-modal').classList.add('active');
 }
 
@@ -133,17 +163,21 @@ function closeCreateModal() {
   document.getElementById('create-modal').classList.remove('active');
 }
 
-// Close modal on outside click
-document.getElementById('edit-modal').addEventListener('click', function(e) {
-  if (e.target === this) closeEditModal();
-});
-document.getElementById('create-modal').addEventListener('click', function(e) {
-  if (e.target === this) closeCreateModal();
+document.getElementById('view-edit-btn').addEventListener('click', openEditModal);
+
+['view-modal', 'edit-modal', 'create-modal'].forEach(function(id) {
+  document.getElementById(id).addEventListener('click', function(e) {
+    if (e.target === this) {
+      if (id === 'view-modal') closeViewModal();
+      if (id === 'edit-modal') closeEditModal();
+      if (id === 'create-modal') closeCreateModal();
+    }
+  });
 });
 
-// Close modal on Escape
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') {
+    closeViewModal();
     closeEditModal();
     closeCreateModal();
   }

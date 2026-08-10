@@ -42,7 +42,6 @@ def create():
             status="active",
             deadline=deadline,
             recurrence="none",
-            recurrence_interval_days=None,
             user_id=current_user.id,
         )
         db.session.add(task)
@@ -63,7 +62,6 @@ def update(task_id):
     if deadline:
         task.deadline = _parse_deadline(deadline)
     task.recurrence = "none"
-    task.recurrence_interval_days = None
     db.session.commit()
     return redirect(url_for("periodic.index"))
 

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Task Manager — Manage your daily tasks, periodic reminders, and code snippets">
-  <title>{% block title %}Task Manager{% endblock %}</title>
+  <meta name="description" content="SMARTER — Manage your daily tasks, periodic reminders, code snippets, and notes">
+  <title>{% block title %}SMARTER{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -20,13 +20,14 @@
         <rect x="3" y="14" width="7" height="7"/>
         <rect x="14" y="14" width="7" height="7"/>
       </svg>
-      <span class="nav-brand-text">TaskManager</span>
+      <span class="nav-brand-text">SMARTER</span>
     </div>
     <nav class="nav-links">
       <a href="{{ url_for('daily.index') }}" {% if request.path == '/' %}class="active"{% endif %}>Daily</a>
       <a href="{{ url_for('periodic.index') }}" {% if '/periodic' in request.path %}class="active"{% endif %}>Periodic</a>
       <a href="{{ url_for('history.index') }}" {% if '/history' in request.path %}class="active"{% endif %}>History</a>
       <a href="{{ url_for('codes.index') }}" {% if '/codes' in request.path %}class="active"{% endif %}>Codes</a>
+      <a href="{{ url_for('notes.index') }}" {% if '/notes' in request.path %}class="active"{% endif %}>Notes</a>
     </nav>
     <div class="nav-user">
       <a href="{{ url_for('profile.index') }}" class="username">signed in as <span>{{ current_user.username }}</span></a>
@@ -35,7 +36,7 @@
   </header>
   {% endif %}
 
-  <main class="container">
+  <main class="container {% block container_class %}{% endblock %}">
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
