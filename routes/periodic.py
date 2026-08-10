@@ -1,12 +1,10 @@
 from datetime import datetime
 
-from flask import Blueprint, render_template, request, redirect, url_for, current_app
+from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required, current_user
 
 from extensions import db
 from models import Task
-from utils import compute_next_deadline
-from email_utils import send_reminder_email
 
 bp = Blueprint("periodic", __name__)
 
@@ -35,9 +33,6 @@ def create():
     title = request.form.get("title", "").strip()
     description = request.form.get("description", "").strip()
     deadline = _parse_deadline(request.form.get("deadline"))
-    recurrence = request.form.get("recurrence") or "none"
-    interval_days = request.form.get("recurrence_interval_days")
-    interval_days = int(interval_days) if interval_days else None
 
     if title:
         task = Task(
@@ -46,24 +41,12 @@ def create():
             type="periodic",
             status="active",
             deadline=deadline,
-            recurrence=recurrence,
-            recurrence_interval_days=interval_days,
+            recurrence="none",
+            recurrence_interval_days=None,
             user_id=current_user.id,
         )
         db.session.add(task)
         db.session.commit()
-        
-        # Send an immediate email notification about the new task
-        subject = f"New Periodic Task Created: {title}"
-        body = f"Hi {current_user.username},\n\nYou have created a new periodic task: {title}\n"
-        if description:
-            body += f"Notes: {description}\n"
-        if deadline:
-            body += f"Deadline: {deadline.strftime('%Y-%m-%d %H:%M')}\n"
-        if recurrence != "none":
-            body += f"Repeats: {recurrence}\n"
-            
-        send_reminder_email(current_app, subject, body, recipient=current_user.email)
         
     return redirect(url_for("periodic.index"))
 
@@ -79,10 +62,8 @@ def update(task_id):
     deadline = request.form.get("deadline")
     if deadline:
         task.deadline = _parse_deadline(deadline)
-    task.recurrence = request.form.get("recurrence", task.recurrence)
-    interval_days = request.form.get("recurrence_interval_days")
-    if interval_days:
-        task.recurrence_interval_days = int(interval_days)
+    task.recurrence = "none"
+    task.recurrence_interval_days = None
     db.session.commit()
     return redirect(url_for("periodic.index"))
 
@@ -94,14 +75,8 @@ def complete(task_id):
     if task.user_id != current_user.id:
         return redirect(url_for("periodic.index"))
 
-    next_deadline = compute_next_deadline(task.deadline, task.recurrence, task.recurrence_interval_days)
-    if next_deadline:
-        # Recurring task: roll forward to next due date
-        task.deadline = next_deadline
-        task.last_reminded_date = None
-    else:
-        task.status = "completed"
-        task.completed_at = datetime.utcnow()
+    task.status = "completed"
+    task.completed_at = datetime.utcnow()
 
     db.session.commit()
     return redirect(url_for("periodic.index"))

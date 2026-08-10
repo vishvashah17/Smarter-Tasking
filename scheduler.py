@@ -3,6 +3,27 @@ from datetime import datetime, timedelta, date
 from extensions import db
 from models import Task, User
 from email_utils import send_reminder_email
+from utils import format_recurrence, recurrence_interval_days
+
+
+def _should_send_periodic_reminder(task, today, window_end):
+    deadline_date = task.deadline.date()
+
+    if deadline_date < today:
+        interval_days = recurrence_interval_days(task.recurrence, task.recurrence_interval_days)
+        if interval_days is None:
+            return task.last_reminded_date != today
+        if task.last_reminded_date is None:
+            return True
+        return (today - task.last_reminded_date).days >= interval_days
+
+    if deadline_date == today:
+        return task.last_reminded_date != today
+
+    if deadline_date <= window_end:
+        return task.last_reminded_date is None
+
+    return False
 
 
 def run_daily_reminder_check(app):
@@ -42,8 +63,8 @@ def run_daily_reminder_check(app):
 
             overdue, due_today, due_soon = [], [], []
             for task in candidates:
-                if task.last_reminded_date == today:
-                    continue  # already reminded today
+                if not _should_send_periodic_reminder(task, today, window_end):
+                    continue
 
                 deadline_date = task.deadline.date()
                 if deadline_date < today:
@@ -60,13 +81,22 @@ def run_daily_reminder_check(app):
             lines = [f"Hi {user.username},\n"]
             if overdue:
                 lines.append("OVERDUE:")
-                lines += [f"  - {t.title} (was due {t.deadline.strftime('%Y-%m-%d')})" for t in overdue]
+                lines += [
+                    f"  - {t.title} (was due {t.deadline.strftime('%Y-%m-%d')}; repeats {format_recurrence(t.recurrence, t.recurrence_interval_days)})"
+                    for t in overdue
+                ]
             if due_today:
                 lines.append("\nDUE TODAY:")
-                lines += [f"  - {t.title}" for t in due_today]
+                lines += [
+                    f"  - {t.title} (repeats {format_recurrence(t.recurrence, t.recurrence_interval_days)})"
+                    for t in due_today
+                ]
             if due_soon:
                 lines.append("\nCOMING UP:")
-                lines += [f"  - {t.title} (due {t.deadline.strftime('%Y-%m-%d')})" for t in due_soon]
+                lines += [
+                    f"  - {t.title} (due {t.deadline.strftime('%Y-%m-%d')}; repeats {format_recurrence(t.recurrence, t.recurrence_interval_days)})"
+                    for t in due_soon
+                ]
 
             body = "\n".join(lines)
             subject = f"Task reminders — {len(relevant)} item(s) need attention"
