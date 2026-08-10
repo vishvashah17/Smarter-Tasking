@@ -14,12 +14,7 @@
   {% if current_user.is_authenticated %}
   <header class="navbar app-header">
     <div class="nav-brand">
-      <svg class="nav-brand-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square">
-        <rect x="3" y="3" width="7" height="7"/>
-        <rect x="14" y="3" width="7" height="7"/>
-        <rect x="3" y="14" width="7" height="7"/>
-        <rect x="14" y="14" width="7" height="7"/>
-      </svg>
+      <img class="nav-brand-icon" src="{{ url_for('static', filename='logo.jpeg') }}" alt="Smarter Logo" width="22" height="22" style="border-radius: 4px; object-fit: cover;">
       <span class="nav-brand-text">SMARTER</span>
     </div>
     <nav class="nav-links">
