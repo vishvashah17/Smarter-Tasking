@@ -657,25 +657,32 @@ h1 {
   gap: 8px;
 }
 
-.snippet-lang{
-
-    padding:5px 12px;
-    border-radius:30px;
-    font-size:11px;
-    font-weight:700;
-    letter-spacing:1px;
-    text-transform:uppercase;
-    color:white;
+.snippet-lang {
+  padding: 4px 10px;
+  border-radius: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #fff;
+  background: #6366f1;
+  flex-shrink: 0;
 }
 
-.snippet-lang.python{background:#3776AB;}
-.snippet-lang.javascript{background:#F7DF1E;color:black;}
-.snippet-lang.java{background:#ED8B00;}
-.snippet-lang.cpp{background:#00599C;}
-.snippet-lang.c{background:#5C6BC0;}
-.snippet-lang.html{background:#E44D26;}
-.snippet-lang.css{background:#2965F1;}
-.snippet-lang.sql{background:#336791;}
+.snippet-lang.lang-python { background: #3776AB; color: #fff; }
+.snippet-lang.lang-javascript { background: #F7DF1E; color: #1a1a1a; }
+.snippet-lang.lang-java { background: #ED8B00; color: #fff; }
+.snippet-lang.lang-cpp { background: #00599C; color: #fff; }
+.snippet-lang.lang-c { background: #5C6BC0; color: #fff; }
+.snippet-lang.lang-html { background: #E44D26; color: #fff; }
+.snippet-lang.lang-css { background: #2965F1; color: #fff; }
+.snippet-lang.lang-sql { background: #336791; color: #fff; }
+.snippet-lang.lang-bash { background: #4EAA25; color: #fff; }
+.snippet-lang.lang-go { background: #00ADD8; color: #fff; }
+.snippet-lang.lang-rust { background: #CE422B; color: #fff; }
+.snippet-lang.lang-typescript { background: #3178C6; color: #fff; }
+.snippet-lang.lang-other,
+.snippet-lang.lang-code { background: #64748b; color: #fff; }
 
 .snippet-actions {
   display: flex;

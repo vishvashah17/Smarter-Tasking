@@ -47,7 +47,7 @@
       <div class="snippet-info">
         <div class="snippet-title">{{ snippet.title }}</div>
         <div class="snippet-meta">
-          <span class="snippet-lang">{{ snippet.language or 'code' }}</span>
+          <span class="snippet-lang lang-{{ snippet.language or 'other' }}">{{ snippet.language or 'code' }}</span>
           <span>Created {{ snippet.created_at.strftime('%Y-%m-%d') }}</span>
           {% if snippet.updated_at != snippet.created_at %}
             <span>· Updated {{ snippet.updated_at.strftime('%Y-%m-%d') }}</span>
