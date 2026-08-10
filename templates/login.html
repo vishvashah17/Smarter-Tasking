@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Log in — Task Manager{% endblock %}
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-box">
+    <div class="auth-brand">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter">
+        <rect x="3" y="3" width="7" height="7"/>
+        <rect x="14" y="3" width="7" height="7"/>
+        <rect x="3" y="14" width="7" height="7"/>
+        <rect x="14" y="14" width="7" height="7"/>
+      </svg>
+    </div>
+    <div class="auth-header">
+      <h1>Welcome back</h1>
+      <p>Sign in to continue managing your tasks</p>
+    </div>
+    <form method="POST" id="login-form">
+      <label>
+        <span class="auth-label-text">Username</span>
+        <input type="text" name="username" id="login-username" required autofocus autocomplete="username" placeholder="Enter your username">
+      </label>
+      <label>
+        <span class="auth-label-text">Password</span>
+        <input type="password" name="password" id="login-password" required autocomplete="current-password" placeholder="Enter your password">
+      </label>
+      <button type="submit" id="login-submit">
+        Sign in
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </form>
+    <div class="auth-divider">
+      <span>or</span>
+    </div>
+    <div class="auth-footer">
+      Don't have an account? <a href="{{ url_for('auth.signup') }}">Create one</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

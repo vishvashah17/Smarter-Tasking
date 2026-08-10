@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Daily Tasks{% endblock %}
+{% block content %}
+<h1>Daily tasks</h1>
+
+<button class="fab" onclick="document.getElementById('create-modal').classList.add('active')" title="New Task">+</button>
+
+<div class="modal-overlay" id="create-modal">
+  <div class="modal-content">
+    <h2>New Task</h2>
+    <form method="POST" action="{{ url_for('daily.create') }}">
+      <label>Title
+        <input type="text" name="title" placeholder="New task title" required>
+      </label>
+      <label>Notes (optional)
+        <input type="text" name="description" placeholder="Notes (optional)">
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="document.getElementById('create-modal').classList.remove('active')">Cancel</button>
+        <button type="submit" class="btn-primary">Add task</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<ul class="task-list">
+  {% for task in tasks %}
+  <li class="task-item">
+    <form method="POST" action="{{ url_for('daily.complete', task_id=task.id) }}" class="inline-form">
+      <button type="submit" class="complete-btn" title="Mark complete">✓</button>
+    </form>
+    <div class="task-body">
+      <div class="task-title">{{ task.title }}</div>
+      {% if task.description %}<div class="task-desc">{{ task.description }}</div>{% endif %}
+    </div>
+    <form method="POST" action="{{ url_for('daily.delete', task_id=task.id) }}" class="inline-form">
+      <button type="submit" class="delete-btn" title="Delete">✕</button>
+    </form>
+  </li>
+  {% else %}
+  <li class="empty-state">No tasks yet — add one above.</li>
+  {% endfor %}
+</ul>
+
+<script>
+document.getElementById('create-modal').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('active');
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    var m = document.getElementById('create-modal');
+    if(m) m.classList.remove('active');
+  }
+});
+</script>
+{% endblock %}

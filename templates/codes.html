@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Code Snippets{% endblock %}
+{% block content %}
+<h1>Code Snippets</h1>
+
+<button class="fab" onclick="openCreateModal()" title="New Snippet">+</button>
+
+<div class="modal-overlay" id="create-modal">
+  <div class="modal-content">
+    <h2>New Snippet</h2>
+    <form method="POST" action="{{ url_for('codes.create') }}" id="code-create-form">
+      <label>Title
+        <input type="text" name="title" id="code-title" placeholder="Snippet title" required>
+      </label>
+      <label>Language
+        <select name="language" id="code-language">
+          <option value="python">Python</option>
+          <option value="javascript">JavaScript</option>
+          <option value="java">Java</option>
+          <option value="cpp">C++</option>
+          <option value="c">C</option>
+          <option value="html">HTML</option>
+          <option value="css">CSS</option>
+          <option value="sql">SQL</option>
+          <option value="bash">Bash</option>
+          <option value="go">Go</option>
+          <option value="rust">Rust</option>
+          <option value="typescript">TypeScript</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+      <label>Code
+        <textarea name="code" id="code-content" placeholder="Paste or write your code here..." required></textarea>
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="closeCreateModal()">Cancel</button>
+        <button type="submit" class="btn-primary" id="code-submit">Save snippet</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="snippet-list">
+  {% for snippet in snippets %}
+  <div class="snippet-card" id="snippet-{{ snippet.id }}">
+    <div class="snippet-header">
+      <div class="snippet-info">
+        <div class="snippet-title">{{ snippet.title }}</div>
+        <div class="snippet-meta">
+          <span class="snippet-lang">{{ snippet.language or 'code' }}</span>
+          <span>Created {{ snippet.created_at.strftime('%Y-%m-%d') }}</span>
+          {% if snippet.updated_at != snippet.created_at %}
+            <span>· Updated {{ snippet.updated_at.strftime('%Y-%m-%d') }}</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="snippet-actions">
+        <button type="button" class="edit-btn" title="Edit"
+                data-snippet='{{ {"id": snippet.id, "title": snippet.title, "code": snippet.code, "language": snippet.language or "python"}|tojson }}'
+                onclick="openEditModal(this)">
+          ✎
+        </button>
+        <form method="POST" action="{{ url_for('codes.delete', snippet_id=snippet.id) }}" class="inline-form snippet-delete-form">
+          <button type="submit" class="delete-btn" title="Delete"
+                  onclick="return confirm('Delete this snippet?')">✕</button>
+        </form>
+      </div>
+    </div>
+    <div class="snippet-code">
+      <pre><code>{{ snippet.code }}</code></pre>
+    </div>
+  </div>
+  {% else %}
+  <div class="empty-state">No code snippets yet — create one above.</div>
+  {% endfor %}
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal-content">
+    <h2>Edit Snippet</h2>
+    <form method="POST" id="edit-form">
+      <label>Title
+        <input type="text" name="title" id="edit-title" required>
+      </label>
+      <label>Language
+        <select name="language" id="edit-language">
+          <option value="python">Python</option>
+          <option value="javascript">JavaScript</option>
+          <option value="java">Java</option>
+          <option value="cpp">C++</option>
+          <option value="c">C</option>
+          <option value="html">HTML</option>
+          <option value="css">CSS</option>
+          <option value="sql">SQL</option>
+          <option value="bash">Bash</option>
+          <option value="go">Go</option>
+          <option value="rust">Rust</option>
+          <option value="typescript">TypeScript</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+      <label>Code
+        <textarea name="code" id="edit-code" required></textarea>
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+        <button type="submit" class="btn-primary">Save changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openEditModal(btn) {
+  var data = JSON.parse(btn.getAttribute('data-snippet'));
+  document.getElementById('edit-title').value = data.title;
+  document.getElementById('edit-code').value = data.code;
+  document.getElementById('edit-language').value = data.language;
+  document.getElementById('edit-form').action = '/codes/' + data.id + '/update';
+  document.getElementById('edit-modal').classList.add('active');
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('active');
+}
+
+function openCreateModal() {
+  document.getElementById('create-modal').classList.add('active');
+}
+
+function closeCreateModal() {
+  document.getElementById('create-modal').classList.remove('active');
+}
+
+// Close modal on outside click
+document.getElementById('edit-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeEditModal();
+});
+document.getElementById('create-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeCreateModal();
+});
+
+// Close modal on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeEditModal();
+    closeCreateModal();
+  }
+});
+</script>
+{% endblock %}

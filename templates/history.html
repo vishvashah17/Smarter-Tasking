@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}History{% endblock %}
+{% block content %}
+
+<div class="history-page">
+  <div class="history-header">
+    <h1>History</h1>
+    <p class="history-subtitle">Your completed and missed tasks</p>
+  </div>
+
+  <div class="history-toolbar">
+    <form method="GET" class="filter-form" id="history-filters">
+      <div class="filter-group">
+        <label class="filter-label" for="type-filter">TYPE</label>
+        <select name="type" id="type-filter" onchange="this.form.submit()">
+          <option value="" {{ 'selected' if not type_filter }}>All types</option>
+          <option value="daily" {{ 'selected' if type_filter == 'daily' }}>Daily</option>
+          <option value="periodic" {{ 'selected' if type_filter == 'periodic' }}>Periodic</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label" for="status-filter">STATUS</label>
+        <select name="status" id="status-filter" onchange="this.form.submit()">
+          <option value="" {{ 'selected' if not status_filter }}>All statuses</option>
+          <option value="completed" {{ 'selected' if status_filter == 'completed' }}>Completed</option>
+          <option value="missed" {{ 'selected' if status_filter == 'missed' }}>Missed</option>
+        </select>
+      </div>
+    </form>
+
+    <div class="history-stats">
+      <div class="stat-chip stat-total">
+        <span class="stat-count">{{ tasks|length }}</span>
+        <span class="stat-label">Total</span>
+      </div>
+      <div class="stat-chip stat-done">
+        <span class="stat-count">{{ tasks|selectattr('status', 'equalto', 'completed')|list|length }}</span>
+        <span class="stat-label">Done</span>
+      </div>
+      <div class="stat-chip stat-missed">
+        <span class="stat-count">{{ tasks|selectattr('status', 'equalto', 'missed')|list|length }}</span>
+        <span class="stat-label">Missed</span>
+      </div>
+    </div>
+  </div>
+
+  <ul class="task-list history-list">
+    {% for task in tasks %}
+    <li class="task-item history-item status-{{ task.status }}" style="animation-delay: {{ loop.index0 * 0.04 }}s">
+      <div class="history-status-indicator">
+        {% if task.status == 'completed' %}
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"><polyline points="20 6 9 17 4 12"/></svg>
+        {% else %}
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        {% endif %}
+      </div>
+      <div class="task-body">
+        <div class="task-title">{{ task.title }}</div>
+        <div class="task-meta">
+          <span class="type-badge">{{ task.type }}</span>
+          <span class="meta-dot">·</span>
+          <span class="status-badge {{ task.status }}">
+            {{ 'Completed' if task.status == 'completed' else 'Missed' }}
+          </span>
+          {% if task.completed_at %}
+            <span class="meta-dot">·</span>
+            <span class="history-date">{{ task.completed_at.strftime('%b %d, %Y') }}</span>
+          {% endif %}
+        </div>
+      </div>
+    </li>
+    {% else %}
+    <li class="empty-state">
+      <div class="empty-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+      </div>
+      <p>No history yet</p>
+      <span class="empty-hint">Complete or miss tasks to see them here</span>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+
+{% endblock %}
