@@ -1,0 +1,15 @@
+export const languages = [
+  "python",
+  "javascript",
+  "typescript",
+  "java",
+  "cpp",
+  "c",
+  "html",
+  "css",
+  "sql",
+  "bash",
+  "go",
+  "rust",
+  "other",
+];
