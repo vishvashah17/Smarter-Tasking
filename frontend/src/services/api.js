@@ -1,6 +1,9 @@
 export async function api(path, options = {}) {
   const { headers = {}, ...rest } = options;
-  const response = await fetch(path, {
+  const baseUrl = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+  const url = `${baseUrl}${path}`;
+
+  const response = await fetch(url, {
     ...rest,
     credentials: "include",
     headers: {

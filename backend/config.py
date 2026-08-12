@@ -14,6 +14,8 @@ def _fix_db_url(url):
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-change-me")
+    SESSION_COOKIE_SAMESITE = os.environ.get("SESSION_COOKIE_SAMESITE", "Lax")
+    SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "false").lower() == "true"
     FRONTEND_ORIGINS = [
         origin.strip()
         for origin in os.environ.get(
