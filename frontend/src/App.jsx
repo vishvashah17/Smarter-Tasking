@@ -15,6 +15,18 @@ export default function App() {
   const [page, setPage] = useState("landing");
   const [authMode, setAuthMode] = useState("login");
   const [flash, setFlash] = useState(null);
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("theme") || "light";
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  function toggleTheme() {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  }
 
   useEffect(() => {
     api("/api/auth/me")
@@ -62,7 +74,7 @@ export default function App() {
 
   return (
     <>
-      <AppHeader user={user} page={page} setPage={setPage} logout={logout} />
+      <AppHeader user={user} page={page} setPage={setPage} logout={logout} theme={theme} toggleTheme={toggleTheme} />
       <main className={`container ${["history", "codes", "notes"].includes(page) ? "container-grid" : ""}`}>
         {flash && <div className={`flash flash-${flash.type}`}>{flash.message}</div>}
         {page === "daily" && <Tasks type="daily" showFlash={showFlash} />}

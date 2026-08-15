@@ -1,4 +1,4 @@
-export default function AppHeader({ user, page, setPage, logout }) {
+export default function AppHeader({ user, page, setPage, logout, theme, toggleTheme }) {
   const links = [
     ["daily", "Daily"],
     ["periodic", "Periodic"],
@@ -20,10 +20,24 @@ export default function AppHeader({ user, page, setPage, logout }) {
         ))}
       </nav>
       <div className="nav-user">
-        <button className="username" onClick={() => setPage("profile")}>
+        <button
+          className="theme-toggle nav-block-btn"
+          onClick={toggleTheme}
+          title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          aria-label="Toggle dark mode"
+        >
+          {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
+        </button>
+        <button
+          className={`username nav-block-btn ${page === "profile" ? "active" : ""}`}
+          onClick={() => setPage("profile")}
+          title="View Profile"
+        >
           signed in as <span>{user.username}</span>
         </button>
-        <button className="logout" onClick={logout}>Log out</button>
+        <button className="logout nav-block-btn" onClick={logout}>
+          Log out
+        </button>
       </div>
     </header>
   );
