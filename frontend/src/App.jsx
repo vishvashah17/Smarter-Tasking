@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "./services/api.js";
+import { AppDataProvider, useAppData } from "./context/AppDataContext.jsx";
 import AppHeader from "./components/AppHeader.jsx";
 import AuthView from "./pages/AuthView.jsx";
 import Codes from "./pages/Codes.jsx";
@@ -8,6 +9,60 @@ import LandingPage from "./pages/LandingPage.jsx";
 import Notes from "./pages/Notes.jsx";
 import Profile from "./pages/Profile.jsx";
 import Tasks from "./pages/Tasks.jsx";
+
+// ─── Loading overlay shown while pre-fetching all data ──────────────────────
+
+function DataLoadingScreen() {
+  return (
+    <div className="boot">
+      <div className="boot-spinner" />
+      <div className="boot-label">Loading your workspace…</div>
+    </div>
+  );
+}
+
+// ─── Inner app (has access to AppDataContext) ────────────────────────────────
+
+function AppInner({ user, page, setPage, logout, theme, toggleTheme, flash, showFlash }) {
+  const { loading, error, prefetchAll } = useAppData();
+
+  // Run the initial pre-fetch once when this component mounts (i.e. right after login).
+  useEffect(() => {
+    prefetchAll();
+  }, []);
+
+  if (loading) return <DataLoadingScreen />;
+
+  if (error) {
+    return (
+      <div className="boot">
+        <div className="boot-label" style={{ color: "var(--danger, #e74c3c)" }}>
+          {error}
+        </div>
+        <button className="btn-primary" style={{ marginTop: "1rem" }} onClick={prefetchAll}>
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <AppHeader user={user} page={page} setPage={setPage} logout={logout} theme={theme} toggleTheme={toggleTheme} />
+      <main className={`container ${["history", "codes", "notes"].includes(page) ? "container-grid" : ""}`}>
+        {flash && <div className={`flash flash-${flash.type}`}>{flash.message}</div>}
+        {page === "daily"    && <Tasks type="daily"    showFlash={showFlash} />}
+        {page === "periodic" && <Tasks type="periodic" showFlash={showFlash} />}
+        {page === "history"  && <History />}
+        {page === "codes"    && <Codes showFlash={showFlash} />}
+        {page === "notes"    && <Notes showFlash={showFlash} />}
+        {page === "profile"  && <Profile showFlash={showFlash} />}
+      </main>
+    </>
+  );
+}
+
+// ─── Root component ──────────────────────────────────────────────────────────
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -51,8 +106,10 @@ export default function App() {
     setPage("auth");
   }
 
+  // Checking session cookie
   if (checkingAuth) return <div className="boot">SMARTER</div>;
 
+  // Not logged in
   if (!user) {
     if (page === "auth") {
       return (
@@ -68,22 +125,22 @@ export default function App() {
         />
       );
     }
-
     return <LandingPage onLogin={openLogin} />;
   }
 
+  // Logged in — wrap with data provider so all pages share the cache
   return (
-    <>
-      <AppHeader user={user} page={page} setPage={setPage} logout={logout} theme={theme} toggleTheme={toggleTheme} />
-      <main className={`container ${["history", "codes", "notes"].includes(page) ? "container-grid" : ""}`}>
-        {flash && <div className={`flash flash-${flash.type}`}>{flash.message}</div>}
-        {page === "daily" && <Tasks type="daily" showFlash={showFlash} />}
-        {page === "periodic" && <Tasks type="periodic" showFlash={showFlash} />}
-        {page === "history" && <History />}
-        {page === "codes" && <Codes showFlash={showFlash} />}
-        {page === "notes" && <Notes showFlash={showFlash} />}
-        {page === "profile" && <Profile showFlash={showFlash} />}
-      </main>
-    </>
+    <AppDataProvider>
+      <AppInner
+        user={user}
+        page={page}
+        setPage={setPage}
+        logout={logout}
+        theme={theme}
+        toggleTheme={toggleTheme}
+        flash={flash}
+        showFlash={showFlash}
+      />
+    </AppDataProvider>
   );
 }

@@ -7,7 +7,7 @@ export default function Notes({ showFlash }) {
       title="Notes"
       empty="No notes yet. Create one with the + button."
       kind="note"
-      listPath="/api/notes"
+      cacheKey="notes"
       listKey="notes"
       itemPath="/api/notes"
       showFlash={showFlash}

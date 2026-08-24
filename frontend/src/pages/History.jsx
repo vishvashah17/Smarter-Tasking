@@ -1,23 +1,34 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Stat from "../components/Stat.jsx";
-import { api } from "../services/api.js";
+import { useAppData } from "../context/AppDataContext.jsx";
 import { shortDate } from "../utils/date.js";
 
 export default function History() {
+  const { cache, fetchHistoryWithFilters } = useAppData();
   const [filters, setFilters] = useState({ type: "", status: "" });
-  const [tasks, setTasks] = useState([]);
 
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (filters.type) params.set("type", filters.type);
-    if (filters.status) params.set("status", filters.status);
-    api(`/api/history?${params.toString()}`).then((data) => setTasks(data.tasks));
-  }, [filters]);
+  // Default view: use the pre-fetched cache. Filtered view: fetch on the fly.
+  const [filteredTasks, setFilteredTasks] = useState(null);
+  const hasFilter = filters.type || filters.status;
 
-  const daily = tasks.filter((task) => task.type === "daily");
-  const periodic = tasks.filter((task) => task.type === "periodic");
-  const done = tasks.filter((task) => task.status === "completed").length;
-  const missed = tasks.filter((task) => task.status === "missed").length;
+  // tasks to display: filtered result if filters are active, otherwise cache
+  const tasks = hasFilter ? (filteredTasks ?? []) : (cache.history?.tasks ?? []);
+
+  async function applyFilters(nextFilters) {
+    setFilters(nextFilters);
+    const anyActive = nextFilters.type || nextFilters.status;
+    if (anyActive) {
+      const result = await fetchHistoryWithFilters(nextFilters);
+      setFilteredTasks(result);
+    } else {
+      setFilteredTasks(null);   // back to cached default
+    }
+  }
+
+  const daily    = tasks.filter((t) => t.type === "daily");
+  const periodic = tasks.filter((t) => t.type === "periodic");
+  const done     = tasks.filter((t) => t.status === "completed").length;
+  const missed   = tasks.filter((t) => t.status === "missed").length;
 
   return (
     <div className="history-page">
@@ -28,14 +39,14 @@ export default function History() {
       <div className="history-toolbar">
         <div className="filter-form history-filter-form">
           <label className="filter-group">Type
-            <select value={filters.type} onChange={(event) => setFilters({ ...filters, type: event.target.value })}>
+            <select value={filters.type} onChange={(e) => applyFilters({ ...filters, type: e.target.value })}>
               <option value="">All types</option>
               <option value="daily">Daily</option>
               <option value="periodic">Periodic</option>
             </select>
           </label>
           <label className="filter-group">Status
-            <select value={filters.status} onChange={(event) => setFilters({ ...filters, status: event.target.value })}>
+            <select value={filters.status} onChange={(e) => applyFilters({ ...filters, status: e.target.value })}>
               <option value="">All statuses</option>
               <option value="completed">Completed</option>
               <option value="missed">Missed</option>
@@ -43,13 +54,13 @@ export default function History() {
           </label>
         </div>
         <div className="history-stats">
-          <Stat label="Total" value={tasks.length} />
-          <Stat label="Done" value={done} />
+          <Stat label="Total"  value={tasks.length} />
+          <Stat label="Done"   value={done} />
           <Stat label="Missed" value={missed} />
         </div>
       </div>
       <div className="history-columns">
-        <HistoryColumn title="Daily" tasks={daily} />
+        <HistoryColumn title="Daily"    tasks={daily} />
         <HistoryColumn title="Periodic" tasks={periodic} />
       </div>
     </div>

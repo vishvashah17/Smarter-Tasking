@@ -7,7 +7,7 @@ export default function Codes({ showFlash }) {
       title="Code Snippets"
       empty="No code snippets yet. Create one with the + button."
       kind="code"
-      listPath="/api/codes"
+      cacheKey="codes"
       listKey="snippets"
       itemPath="/api/codes"
       showFlash={showFlash}

@@ -1,20 +1,17 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Modal from "../components/Modal.jsx";
+import { useAppData } from "../context/AppDataContext.jsx";
 import { api } from "../services/api.js";
 
 export default function Tasks({ type, showFlash }) {
-  const [tasks, setTasks] = useState([]);
+  const { cache, invalidate } = useAppData();
+  const cacheKey = type === "daily" ? "dailyTasks" : "periodicTasks";
+
+  // Read tasks directly from the shared cache
+  const tasks = cache[cacheKey]?.tasks ?? [];
+
   const [modal, setModal] = useState(false);
   const [form, setForm] = useState({ title: "", description: "", deadline: "" });
-
-  async function load() {
-    const data = await api(`/api/tasks?type=${type}&status=active`);
-    setTasks(data.tasks);
-  }
-
-  useEffect(() => {
-    load();
-  }, [type]);
 
   async function createTask(event) {
     event.preventDefault();
@@ -25,19 +22,20 @@ export default function Tasks({ type, showFlash }) {
     setForm({ title: "", description: "", deadline: "" });
     setModal(false);
     showFlash("Task added.");
-    load();
+    invalidate(cacheKey);           // refresh only this slice
   }
 
   async function completeTask(id) {
     await api(`/api/tasks/${id}/complete`, { method: "POST", body: "{}" });
     showFlash("Task completed.");
-    load();
+    invalidate(cacheKey);
+    invalidate("history");          // history is now stale too
   }
 
   async function deleteTask(id) {
     await api(`/api/tasks/${id}`, { method: "DELETE" });
     showFlash("Task deleted.");
-    load();
+    invalidate(cacheKey);
   }
 
   return (

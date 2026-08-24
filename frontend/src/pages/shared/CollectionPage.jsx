@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { shortDate } from "../../utils/date.js";
+import { useAppData } from "../../context/AppDataContext.jsx";
 import CollectionEditor from "./CollectionEditor.jsx";
 import CollectionViewer from "./CollectionViewer.jsx";
 
@@ -7,26 +8,20 @@ export default function CollectionPage({
   title,
   empty,
   kind,
-  listPath,
-  listKey,
-  itemPath,
+  listKey,        // key inside cache (e.g. "codes" or "notes")
+  cacheKey,       // key used in AppDataContext (e.g. "codes" or "notes")
+  itemPath,       // base path for create/update/delete (e.g. "/api/codes")
   showFlash,
   createMessage,
   updateMessage,
   deleteMessage,
   apiClient,
 }) {
-  const [items, setItems] = useState([]);
+  const { cache, invalidate } = useAppData();
   const [modal, setModal] = useState(null);
 
-  async function load() {
-    const data = await apiClient(listPath);
-    setItems(data[listKey]);
-  }
-
-  useEffect(() => {
-    load();
-  }, []);
+  // Read from shared cache — no local API call needed
+  const items = cache[cacheKey]?.[listKey] ?? [];
 
   async function save(item) {
     const editing = Boolean(item.id);
@@ -36,14 +31,14 @@ export default function CollectionPage({
     });
     setModal(null);
     showFlash(editing ? updateMessage : createMessage);
-    load();
+    invalidate(cacheKey);   // refresh this slice in cache
   }
 
   async function remove(id) {
     await apiClient(`${itemPath}/${id}`, { method: "DELETE" });
     setModal(null);
     showFlash(deleteMessage);
-    load();
+    invalidate(cacheKey);
   }
 
   return (
