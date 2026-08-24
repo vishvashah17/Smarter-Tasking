@@ -1,14 +1,46 @@
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+
 export default function AppHeader({ user, page, setPage, logout, theme, toggleTheme }) {
+  const headerRef = useRef(null);
+
   const links = [
-    ["daily", "Daily"],
+    ["daily",    "Daily"],
     ["periodic", "Periodic"],
-    ["history", "History"],
-    ["codes", "Codes"],
-    ["notes", "Notes"],
+    ["history",  "History"],
+    ["codes",    "Codes"],
+    ["notes",    "Notes"],
   ];
 
+  // ── Slide the whole header down once on first render ──────────────────────
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        headerRef.current,
+        { y: -64, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.55, ease: "power3.out" }
+      );
+
+      // Nav links stagger in
+      gsap.fromTo(
+        ".nav-links button",
+        { opacity: 0, y: -10 },
+        { opacity: 1, y: 0, duration: 0.35, ease: "power2.out", stagger: 0.06, delay: 0.2 }
+      );
+
+      // Right-side actions fade in
+      gsap.fromTo(
+        ".nav-user > *",
+        { opacity: 0, x: 12 },
+        { opacity: 1, x: 0, duration: 0.35, ease: "power2.out", stagger: 0.08, delay: 0.3 }
+      );
+    }, headerRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <header className="navbar app-header">
+    <header ref={headerRef} className="navbar app-header" style={{ opacity: 0 }}>
       <button className="nav-brand" onClick={() => setPage("daily")}>
         <span className="nav-brand-text">SMARTER</span>
       </button>

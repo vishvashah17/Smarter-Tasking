@@ -100,7 +100,9 @@ a {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .boot-label {
@@ -334,20 +336,41 @@ h1 {
   border-color: var(--danger);
 }
 
-.fab {
-  position: fixed;
-  right: 32px;
-  bottom: 32px;
-  width: 56px;
-  height: 56px;
-  z-index: 90;
-  border: 1px solid var(--accent);
-  border-radius: 0;
+.task-item-add {
+  border: 1px dashed var(--border);
+  background: var(--bg-glass);
+  cursor: pointer;
+  justify-content: center;
+  margin-bottom: 12px;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+}
+
+.task-item-add:hover {
+  border-color: var(--border-focus);
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+}
+
+.task-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.task-add-plus {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
   background: var(--accent);
   color: #fff;
-  font-size: 28px;
+  font-size: 16px;
+  font-weight: 800;
   line-height: 1;
-  box-shadow: var(--shadow-md);
 }
 
 .empty-state {
@@ -359,38 +382,25 @@ h1 {
 
 .auth-wrapper {
   min-height: 100vh;
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(420px, 0.95fr);
-  padding: 0;
-  background: var(--bg-secondary);
-}
-
-.auth-visual {
-  min-height: 100vh;
-  overflow: hidden;
-  border-right: 1px solid var(--border);
-}
-
-.auth-visual img {
-  width: 100%;
-  height: 100%;
-  min-height: 100vh;
-  display: block;
-  object-fit: cover;
-  object-position: center;
-}
-
-.auth-panel {
-  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 56px;
+  padding: 24px;
   background:
-    linear-gradient(rgba(0, 0, 0, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.025) 1px, transparent 1px),
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
     var(--bg-primary);
   background-size: 40px 40px, 40px 40px, 100% 100%;
+}
+
+.auth-panel {
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
 }
 
 .auth-back {
@@ -840,7 +850,7 @@ textarea:focus {
   padding: 28px 26px;
 }
 
-.workflow-step + .workflow-step {
+.workflow-step+.workflow-step {
   border-left: 1px dashed var(--border);
 }
 
@@ -1040,6 +1050,53 @@ textarea:focus {
   box-shadow: var(--shadow-md);
 }
 
+.grid-card-add {
+  border: 1px dashed var(--border);
+  background: var(--bg-glass);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+}
+
+.grid-card-add:hover,
+.grid-card-add:focus {
+  border-color: var(--border-focus);
+  background: var(--accent-soft);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.grid-card-add-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+}
+
+.grid-card-add-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.grid-card-add-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .grid-card-top {
   display: flex;
   align-items: flex-start;
@@ -1091,18 +1148,54 @@ textarea:focus {
   text-transform: uppercase;
 }
 
-.lang-python { background: #3776ab; }
-.lang-javascript { background: #f7df1e; color: #1c1f23; }
-.lang-typescript { background: #3178c6; }
-.lang-java { background: #ed8b00; }
-.lang-cpp { background: #00599c; }
-.lang-c { background: #5c6bc0; }
-.lang-html { background: #e44d26; }
-.lang-css { background: #2965f1; }
-.lang-sql { background: #336791; }
-.lang-bash { background: #4eaa25; }
-.lang-go { background: #00add8; }
-.lang-rust { background: #ce422b; }
+.lang-python {
+  background: #3776ab;
+}
+
+.lang-javascript {
+  background: #f7df1e;
+  color: #1c1f23;
+}
+
+.lang-typescript {
+  background: #3178c6;
+}
+
+.lang-java {
+  background: #ed8b00;
+}
+
+.lang-cpp {
+  background: #00599c;
+}
+
+.lang-c {
+  background: #5c6bc0;
+}
+
+.lang-html {
+  background: #e44d26;
+}
+
+.lang-css {
+  background: #2965f1;
+}
+
+.lang-sql {
+  background: #336791;
+}
+
+.lang-bash {
+  background: #4eaa25;
+}
+
+.lang-go {
+  background: #00add8;
+}
+
+.lang-rust {
+  background: #ce422b;
+}
 
 .modal-overlay {
   position: fixed;
@@ -1340,7 +1433,7 @@ textarea:focus {
     grid-template-columns: 1fr 1fr;
   }
 
-  .workflow-step + .workflow-step {
+  .workflow-step+.workflow-step {
     border-left: 0;
     border-top: 1px dashed var(--border);
   }
@@ -1414,9 +1507,9 @@ textarea:focus {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   LOADING SCREEN  ·  aesthetic 0–100 % boot sequence
-   ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LOADING SCREEN  ·  GSAP-powered 0 → 100 % boot sequence
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 .ls-root {
   position: fixed;
@@ -1431,16 +1524,7 @@ textarea:focus {
   color: #f0f6fc;
 }
 
-.ls-root.ls-exit {
-  animation: ls-fade-out 0.55s cubic-bezier(0.4, 0, 1, 1) forwards;
-}
-
-@keyframes ls-fade-out {
-  0%   { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.015); pointer-events: none; }
-}
-
-/* ── noise grain ───────────────────────────────────────────────── */
+/* ── noise grain ────────────────────────────────────────────────────────── */
 .ls-noise {
   position: absolute;
   inset: 0;
@@ -1452,15 +1536,32 @@ textarea:focus {
 }
 
 @keyframes ls-noise-drift {
-  0%   { background-position: 0    0; }
-  20%  { background-position: -30px 15px; }
-  40%  { background-position: 20px -10px; }
-  60%  { background-position: -15px 25px; }
-  80%  { background-position: 35px -20px; }
-  100% { background-position: 0    0; }
+  0% {
+    background-position: 0 0;
+  }
+
+  20% {
+    background-position: -30px 15px;
+  }
+
+  40% {
+    background-position: 20px -10px;
+  }
+
+  60% {
+    background-position: -15px 25px;
+  }
+
+  80% {
+    background-position: 35px -20px;
+  }
+
+  100% {
+    background-position: 0 0;
+  }
 }
 
-/* ── floating dots ─────────────────────────────────────────────── */
+/* ── floating dots ──────────────────────────────────────────────────────── */
 .ls-dots {
   list-style: none;
   margin: 0;
@@ -1478,37 +1579,166 @@ textarea:focus {
   background: rgba(255, 255, 255, 0.18);
 }
 
-.ls-dot:nth-child(1)  { left:  4%; top: 12%; animation: ls-dot-pulse 3.20s ease-in-out infinite 0.00s; }
-.ls-dot:nth-child(2)  { left: 13%; top: 73%; animation: ls-dot-pulse 2.80s ease-in-out infinite 0.23s; }
-.ls-dot:nth-child(3)  { left: 21%; top: 34%; animation: ls-dot-pulse 3.50s ease-in-out infinite 0.46s; }
-.ls-dot:nth-child(4)  { left: 30%; top: 88%; animation: ls-dot-pulse 2.60s ease-in-out infinite 0.69s; }
-.ls-dot:nth-child(5)  { left: 38%; top: 22%; animation: ls-dot-pulse 3.10s ease-in-out infinite 0.92s; }
-.ls-dot:nth-child(6)  { left: 47%; top: 61%; animation: ls-dot-pulse 2.90s ease-in-out infinite 1.15s; }
-.ls-dot:nth-child(7)  { left: 56%; top: 45%; animation: ls-dot-pulse 3.40s ease-in-out infinite 1.38s; }
-.ls-dot:nth-child(8)  { left: 65%; top: 79%; animation: ls-dot-pulse 2.70s ease-in-out infinite 1.61s; }
-.ls-dot:nth-child(9)  { left: 73%; top: 16%; animation: ls-dot-pulse 3.30s ease-in-out infinite 1.84s; }
-.ls-dot:nth-child(10) { left: 82%; top: 55%; animation: ls-dot-pulse 2.85s ease-in-out infinite 2.07s; }
-.ls-dot:nth-child(11) { left: 91%; top: 30%; animation: ls-dot-pulse 3.15s ease-in-out infinite 2.30s; }
-.ls-dot:nth-child(12) { left: 96%; top: 90%; animation: ls-dot-pulse 2.75s ease-in-out infinite 2.53s; }
-.ls-dot:nth-child(13) { left:  8%; top: 48%; animation: ls-dot-pulse 3.25s ease-in-out infinite 0.11s; }
-.ls-dot:nth-child(14) { left: 17%; top:  5%; animation: ls-dot-pulse 2.95s ease-in-out infinite 0.34s; }
-.ls-dot:nth-child(15) { left: 25%; top: 65%; animation: ls-dot-pulse 3.45s ease-in-out infinite 0.57s; }
-.ls-dot:nth-child(16) { left: 42%; top: 82%; animation: ls-dot-pulse 2.65s ease-in-out infinite 0.80s; }
-.ls-dot:nth-child(17) { left: 60%; top:  8%; animation: ls-dot-pulse 3.05s ease-in-out infinite 1.03s; }
-.ls-dot:nth-child(18) { left: 70%; top: 38%; animation: ls-dot-pulse 2.88s ease-in-out infinite 1.26s; }
-.ls-dot:nth-child(19) { left: 78%; top: 95%; animation: ls-dot-pulse 3.35s ease-in-out infinite 1.49s; }
-.ls-dot:nth-child(20) { left: 87%; top: 68%; animation: ls-dot-pulse 2.72s ease-in-out infinite 1.72s; }
-.ls-dot:nth-child(21) { left: 93%; top: 42%; animation: ls-dot-pulse 3.18s ease-in-out infinite 1.95s; }
-.ls-dot:nth-child(22) { left: 35%; top: 52%; animation: ls-dot-pulse 2.82s ease-in-out infinite 2.18s; }
-.ls-dot:nth-child(23) { left: 52%; top: 28%; animation: ls-dot-pulse 3.38s ease-in-out infinite 2.41s; }
-.ls-dot:nth-child(24) { left:  2%; top: 92%; animation: ls-dot-pulse 2.68s ease-in-out infinite 2.64s; }
-
-@keyframes ls-dot-pulse {
-  0%, 100% { opacity: 0.12; transform: scale(1); }
-  50%       { opacity: 0.55; transform: scale(1.9); }
+/* Positions — GSAP handles opacity/scale, CSS just places them */
+.ls-dot:nth-child(1) {
+  left: 4%;
+  top: 12%;
+  animation: ls-dot-pulse 3.20s ease-in-out infinite 0.00s;
 }
 
-/* ── brand ─────────────────────────────────────────────────────── */
+.ls-dot:nth-child(2) {
+  left: 13%;
+  top: 73%;
+  animation: ls-dot-pulse 2.80s ease-in-out infinite 0.23s;
+}
+
+.ls-dot:nth-child(3) {
+  left: 21%;
+  top: 34%;
+  animation: ls-dot-pulse 3.50s ease-in-out infinite 0.46s;
+}
+
+.ls-dot:nth-child(4) {
+  left: 30%;
+  top: 88%;
+  animation: ls-dot-pulse 2.60s ease-in-out infinite 0.69s;
+}
+
+.ls-dot:nth-child(5) {
+  left: 38%;
+  top: 22%;
+  animation: ls-dot-pulse 3.10s ease-in-out infinite 0.92s;
+}
+
+.ls-dot:nth-child(6) {
+  left: 47%;
+  top: 61%;
+  animation: ls-dot-pulse 2.90s ease-in-out infinite 1.15s;
+}
+
+.ls-dot:nth-child(7) {
+  left: 56%;
+  top: 45%;
+  animation: ls-dot-pulse 3.40s ease-in-out infinite 1.38s;
+}
+
+.ls-dot:nth-child(8) {
+  left: 65%;
+  top: 79%;
+  animation: ls-dot-pulse 2.70s ease-in-out infinite 1.61s;
+}
+
+.ls-dot:nth-child(9) {
+  left: 73%;
+  top: 16%;
+  animation: ls-dot-pulse 3.30s ease-in-out infinite 1.84s;
+}
+
+.ls-dot:nth-child(10) {
+  left: 82%;
+  top: 55%;
+  animation: ls-dot-pulse 2.85s ease-in-out infinite 2.07s;
+}
+
+.ls-dot:nth-child(11) {
+  left: 91%;
+  top: 30%;
+  animation: ls-dot-pulse 3.15s ease-in-out infinite 2.30s;
+}
+
+.ls-dot:nth-child(12) {
+  left: 96%;
+  top: 90%;
+  animation: ls-dot-pulse 2.75s ease-in-out infinite 2.53s;
+}
+
+.ls-dot:nth-child(13) {
+  left: 8%;
+  top: 48%;
+  animation: ls-dot-pulse 3.25s ease-in-out infinite 0.11s;
+}
+
+.ls-dot:nth-child(14) {
+  left: 17%;
+  top: 5%;
+  animation: ls-dot-pulse 2.95s ease-in-out infinite 0.34s;
+}
+
+.ls-dot:nth-child(15) {
+  left: 25%;
+  top: 65%;
+  animation: ls-dot-pulse 3.45s ease-in-out infinite 0.57s;
+}
+
+.ls-dot:nth-child(16) {
+  left: 42%;
+  top: 82%;
+  animation: ls-dot-pulse 2.65s ease-in-out infinite 0.80s;
+}
+
+.ls-dot:nth-child(17) {
+  left: 60%;
+  top: 8%;
+  animation: ls-dot-pulse 3.05s ease-in-out infinite 1.03s;
+}
+
+.ls-dot:nth-child(18) {
+  left: 70%;
+  top: 38%;
+  animation: ls-dot-pulse 2.88s ease-in-out infinite 1.26s;
+}
+
+.ls-dot:nth-child(19) {
+  left: 78%;
+  top: 95%;
+  animation: ls-dot-pulse 3.35s ease-in-out infinite 1.49s;
+}
+
+.ls-dot:nth-child(20) {
+  left: 87%;
+  top: 68%;
+  animation: ls-dot-pulse 2.72s ease-in-out infinite 1.72s;
+}
+
+.ls-dot:nth-child(21) {
+  left: 93%;
+  top: 42%;
+  animation: ls-dot-pulse 3.18s ease-in-out infinite 1.95s;
+}
+
+.ls-dot:nth-child(22) {
+  left: 35%;
+  top: 52%;
+  animation: ls-dot-pulse 2.82s ease-in-out infinite 2.18s;
+}
+
+.ls-dot:nth-child(23) {
+  left: 52%;
+  top: 28%;
+  animation: ls-dot-pulse 3.38s ease-in-out infinite 2.41s;
+}
+
+.ls-dot:nth-child(24) {
+  left: 2%;
+  top: 92%;
+  animation: ls-dot-pulse 2.68s ease-in-out infinite 2.64s;
+}
+
+@keyframes ls-dot-pulse {
+
+  0%,
+  100% {
+    opacity: 0.12;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.55;
+    transform: scale(2);
+  }
+}
+
+/* ── brand ──────────────────────────────────────────────────────────────── */
 .ls-brand {
   display: flex;
   align-items: baseline;
@@ -1533,7 +1763,7 @@ textarea:focus {
   line-height: 1;
 }
 
-/* ── big percentage counter ────────────────────────────────────── */
+/* ── percentage counter ─────────────────────────────────────────────────── */
 .ls-counter {
   display: flex;
   align-items: flex-start;
@@ -1560,7 +1790,7 @@ textarea:focus {
   letter-spacing: 0;
 }
 
-/* ── progress bar ──────────────────────────────────────────────── */
+/* ── progress bar ───────────────────────────────────────────────────────── */
 .ls-bar-track {
   position: relative;
   width: min(560px, 82vw);
@@ -1574,8 +1804,8 @@ textarea:focus {
   position: absolute;
   inset-block: 0;
   left: 0;
-  background: linear-gradient(90deg, rgba(255,255,255,0.12) 0%, #ffffff 100%);
-  transition: width 0.07s linear;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0%, #ffffff 100%);
+  /* width animated by GSAP */
 }
 
 .ls-bar-glow {
@@ -1587,13 +1817,13 @@ textarea:focus {
   border-radius: 50%;
   background: #ffffff;
   box-shadow:
-    0 0 6px  4px rgba(255, 255, 255, 0.5),
+    0 0 6px 4px rgba(255, 255, 255, 0.5),
     0 0 20px 8px rgba(255, 255, 255, 0.18);
-  transition: left 0.07s linear;
   pointer-events: none;
+  /* left animated by GSAP */
 }
 
-/* ── status label ──────────────────────────────────────────────── */
+/* ── status row ─────────────────────────────────────────────────────────── */
 .ls-status {
   display: flex;
   align-items: center;
@@ -1610,8 +1840,17 @@ textarea:focus {
 }
 
 @keyframes ls-step-blink {
-  0%, 100% { opacity: 1;   transform: scale(1); }
-  50%       { opacity: 0.3; transform: scale(0.7); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.3;
+    transform: scale(0.7);
+  }
 }
 
 .ls-step-label {
@@ -1621,10 +1860,4 @@ textarea:focus {
   letter-spacing: 0.22em;
   color: rgba(255, 255, 255, 0.38);
   text-transform: uppercase;
-  animation: ls-label-in 0.22s ease;
-}
-
-@keyframes ls-label-in {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
 }

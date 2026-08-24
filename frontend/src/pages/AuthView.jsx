@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { api } from "../services/api.js";
-import authImage from "../../image1.png";
 
 export default function AuthView({ initialMode = "login", onLogin, onBack, showFlash, flash }) {
   const [mode, setMode] = useState(initialMode);
@@ -23,9 +22,6 @@ export default function AuthView({ initialMode = "login", onLogin, onBack, showF
 
   return (
     <main className="auth-wrapper">
-      <section className="auth-visual" aria-label="SmarterTasking workspace preview">
-        <img src={authImage} alt="" />
-      </section>
       <section className="auth-panel">
         <div className="auth-box">
           <button className="auth-back" type="button" onClick={onBack}>Back to overview</button>

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
 import Modal from "../components/Modal.jsx";
 import { useAppData } from "../context/AppDataContext.jsx";
 import { api } from "../services/api.js";
@@ -7,16 +8,55 @@ export default function Tasks({ type, showFlash }) {
   const { cache, invalidate, optimisticUpdate } = useAppData();
   const cacheKey = type === "daily" ? "dailyTasks" : "periodicTasks";
 
-  // Read tasks directly from the shared cache
-  const tasks = cache[cacheKey]?.tasks ?? [];
+  const tasks    = cache[cacheKey]?.tasks ?? [];
+  const listRef  = useRef(null);
+  const prevLen  = useRef(tasks.length);
 
   const [modal, setModal] = useState(false);
-  const [form, setForm] = useState({ title: "", description: "", deadline: "" });
+  const [form,  setForm]  = useState({ title: "", description: "", deadline: "" });
+
+  // ── Stagger all items in when the page first mounts ───────────────────────
+  useEffect(() => {
+    if (!listRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        ".task-item",
+        { opacity: 0, x: -24 },
+        { opacity: 1, x: 0, duration: 0.4, ease: "power3.out", stagger: 0.07 }
+      );
+    }, listRef);
+    return () => ctx.revert();
+  // Only on initial mount — deliberately empty dep array
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ── Animate in each freshly-prepended task (after optimistic update) ───────
+  useEffect(() => {
+    if (!listRef.current) return;
+    if (tasks.length <= prevLen.current) {
+      prevLen.current = tasks.length;
+      return;
+    }
+    prevLen.current = tasks.length;
+
+    // The newly created task is prepended right after the add card
+    const taskItems = listRef.current.querySelectorAll(".task-item-real");
+    if (taskItems.length > 0) {
+      const firstItem = taskItems[0];
+      gsap.fromTo(
+        firstItem,
+        { opacity: 0, y: -28, scale: 0.95 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.42, ease: "power3.out" }
+      );
+    }
+  }, [tasks.length]);
+
+  // ─── Mutations ─────────────────────────────────────────────────────────────
 
   async function createTask(event) {
     event.preventDefault();
     const newTask = {
-      id: `temp-${Date.now()}`,      // temporary id – replaced after server sync
+      id: `temp-${Date.now()}`,
       ...form,
       type,
       deadline: form.deadline || null,
@@ -38,7 +78,11 @@ export default function Tasks({ type, showFlash }) {
     );
   }
 
-  async function completeTask(id) {
+  async function completeTask(id, el) {
+    // Animate the item out before removing it
+    if (el) {
+      await gsap.to(el, { opacity: 0, x: 40, scale: 0.95, duration: 0.28, ease: "power2.in" });
+    }
     showFlash("Task completed.");
 
     await optimisticUpdate(
@@ -47,11 +91,13 @@ export default function Tasks({ type, showFlash }) {
       () => api(`/api/tasks/${id}/complete`, { method: "POST", body: "{}" }),
       (err) => showFlash(`Failed to complete task: ${err.message}`)
     );
-    // history slice is now stale regardless of rollback
     invalidate("history");
   }
 
-  async function deleteTask(id) {
+  async function deleteTask(id, el) {
+    if (el) {
+      await gsap.to(el, { opacity: 0, x: 40, scale: 0.95, duration: 0.28, ease: "power2.in" });
+    }
     showFlash("Task deleted.");
 
     await optimisticUpdate(
@@ -65,33 +111,67 @@ export default function Tasks({ type, showFlash }) {
   return (
     <>
       <h1>{type === "daily" ? "Daily tasks" : "Periodic tasks"}</h1>
-      <button className="fab" onClick={() => setModal(true)} title="New task">+</button>
-      <ul className="task-list">
+      <ul ref={listRef} className="task-list">
+        <li className="task-item task-item-add" onClick={() => setModal(true)} tabIndex="0">
+          <div className="task-add-btn">
+            <span className="task-add-plus">+</span>
+            <span>Add new {type === "daily" ? "daily task" : "periodic task"}...</span>
+          </div>
+        </li>
+
         {tasks.map((task) => (
-          <li className="task-item" key={task.id}>
-            <button className="complete-btn" title="Mark complete" onClick={() => completeTask(task.id)}>✓</button>
+          <li className="task-item task-item-real" key={task.id}>
+            <button
+              className="complete-btn"
+              title="Mark complete"
+              onClick={(e) => completeTask(task.id, e.currentTarget.closest(".task-item"))}
+            >✓</button>
             <div className="task-body">
               <div className="task-title">{task.title}</div>
               {task.description && <div className="task-desc">{task.description}</div>}
-              {task.deadline && <div className="task-meta">Due {new Date(task.deadline).toLocaleString()}</div>}
+              {task.deadline    && (
+                <div className="task-meta">Due {new Date(task.deadline).toLocaleString()}</div>
+              )}
             </div>
-            <button className="delete-btn" title="Delete" onClick={() => deleteTask(task.id)}>x</button>
+            <button
+              className="delete-btn"
+              title="Delete"
+              onClick={(e) => deleteTask(task.id, e.currentTarget.closest(".task-item"))}
+            >x</button>
           </li>
         ))}
-        {!tasks.length && <li className="empty-state">No tasks yet. Add one with the + button.</li>}
+        {!tasks.length && (
+          <li className="empty-state">No active tasks. Click above to add one.</li>
+        )}
       </ul>
+
       {modal && (
-        <Modal title={type === "daily" ? "New Task" : "New Periodic Task"} onClose={() => setModal(false)}>
+        <Modal
+          title={type === "daily" ? "New Task" : "New Periodic Task"}
+          onClose={() => setModal(false)}
+        >
           <form onSubmit={createTask}>
             <label>Title
-              <input value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} required />
+              <input
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                required
+              />
             </label>
             <label>Notes
-              <input value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} />
+              <input
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+              />
             </label>
             {type === "periodic" && (
               <label>Deadline
-                <input type="datetime-local" value={form.deadline} onChange={(event) => setForm({ ...form, deadline: event.target.value })} required />
+                <input
+                  type="datetime-local"
+                  value={form.deadline}
+                  onChange={(e) => setForm({ ...form, deadline: e.target.value })}
+                  required
+                />
               </label>
             )}
             <div className="modal-actions">
