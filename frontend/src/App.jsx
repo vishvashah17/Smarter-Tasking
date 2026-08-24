@@ -9,17 +9,7 @@ import LandingPage from "./pages/LandingPage.jsx";
 import Notes from "./pages/Notes.jsx";
 import Profile from "./pages/Profile.jsx";
 import Tasks from "./pages/Tasks.jsx";
-
-// ─── Loading overlay shown while pre-fetching all data ──────────────────────
-
-function DataLoadingScreen() {
-  return (
-    <div className="boot">
-      <div className="boot-spinner" />
-      <div className="boot-label">Loading your workspace…</div>
-    </div>
-  );
-}
+import LoadingScreen from "./components/LoadingScreen.jsx";
 
 // ─── Inner app (has access to AppDataContext) ────────────────────────────────
 
@@ -31,7 +21,7 @@ function AppInner({ user, page, setPage, logout, theme, toggleTheme, flash, show
     prefetchAll();
   }, []);
 
-  if (loading) return <DataLoadingScreen />;
+  if (loading) return <LoadingScreen />;
 
   if (error) {
     return (
@@ -107,7 +97,7 @@ export default function App() {
   }
 
   // Checking session cookie
-  if (checkingAuth) return <div className="boot">SMARTER</div>;
+  if (checkingAuth) return <LoadingScreen />;
 
   // Not logged in
   if (!user) {

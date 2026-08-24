@@ -1413,3 +1413,218 @@ textarea:focus {
     flex-direction: column;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   LOADING SCREEN  ·  aesthetic 0–100 % boot sequence
+   ═══════════════════════════════════════════════════════════════ */
+
+.ls-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #07090c;
+  overflow: hidden;
+  color: #f0f6fc;
+}
+
+.ls-root.ls-exit {
+  animation: ls-fade-out 0.55s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes ls-fade-out {
+  0%   { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.015); pointer-events: none; }
+}
+
+/* ── noise grain ───────────────────────────────────────────────── */
+.ls-noise {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  opacity: 0.4;
+  animation: ls-noise-drift 8s steps(10) infinite;
+}
+
+@keyframes ls-noise-drift {
+  0%   { background-position: 0    0; }
+  20%  { background-position: -30px 15px; }
+  40%  { background-position: 20px -10px; }
+  60%  { background-position: -15px 25px; }
+  80%  { background-position: 35px -20px; }
+  100% { background-position: 0    0; }
+}
+
+/* ── floating dots ─────────────────────────────────────────────── */
+.ls-dots {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.ls-dot {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.ls-dot:nth-child(1)  { left:  4%; top: 12%; animation: ls-dot-pulse 3.20s ease-in-out infinite 0.00s; }
+.ls-dot:nth-child(2)  { left: 13%; top: 73%; animation: ls-dot-pulse 2.80s ease-in-out infinite 0.23s; }
+.ls-dot:nth-child(3)  { left: 21%; top: 34%; animation: ls-dot-pulse 3.50s ease-in-out infinite 0.46s; }
+.ls-dot:nth-child(4)  { left: 30%; top: 88%; animation: ls-dot-pulse 2.60s ease-in-out infinite 0.69s; }
+.ls-dot:nth-child(5)  { left: 38%; top: 22%; animation: ls-dot-pulse 3.10s ease-in-out infinite 0.92s; }
+.ls-dot:nth-child(6)  { left: 47%; top: 61%; animation: ls-dot-pulse 2.90s ease-in-out infinite 1.15s; }
+.ls-dot:nth-child(7)  { left: 56%; top: 45%; animation: ls-dot-pulse 3.40s ease-in-out infinite 1.38s; }
+.ls-dot:nth-child(8)  { left: 65%; top: 79%; animation: ls-dot-pulse 2.70s ease-in-out infinite 1.61s; }
+.ls-dot:nth-child(9)  { left: 73%; top: 16%; animation: ls-dot-pulse 3.30s ease-in-out infinite 1.84s; }
+.ls-dot:nth-child(10) { left: 82%; top: 55%; animation: ls-dot-pulse 2.85s ease-in-out infinite 2.07s; }
+.ls-dot:nth-child(11) { left: 91%; top: 30%; animation: ls-dot-pulse 3.15s ease-in-out infinite 2.30s; }
+.ls-dot:nth-child(12) { left: 96%; top: 90%; animation: ls-dot-pulse 2.75s ease-in-out infinite 2.53s; }
+.ls-dot:nth-child(13) { left:  8%; top: 48%; animation: ls-dot-pulse 3.25s ease-in-out infinite 0.11s; }
+.ls-dot:nth-child(14) { left: 17%; top:  5%; animation: ls-dot-pulse 2.95s ease-in-out infinite 0.34s; }
+.ls-dot:nth-child(15) { left: 25%; top: 65%; animation: ls-dot-pulse 3.45s ease-in-out infinite 0.57s; }
+.ls-dot:nth-child(16) { left: 42%; top: 82%; animation: ls-dot-pulse 2.65s ease-in-out infinite 0.80s; }
+.ls-dot:nth-child(17) { left: 60%; top:  8%; animation: ls-dot-pulse 3.05s ease-in-out infinite 1.03s; }
+.ls-dot:nth-child(18) { left: 70%; top: 38%; animation: ls-dot-pulse 2.88s ease-in-out infinite 1.26s; }
+.ls-dot:nth-child(19) { left: 78%; top: 95%; animation: ls-dot-pulse 3.35s ease-in-out infinite 1.49s; }
+.ls-dot:nth-child(20) { left: 87%; top: 68%; animation: ls-dot-pulse 2.72s ease-in-out infinite 1.72s; }
+.ls-dot:nth-child(21) { left: 93%; top: 42%; animation: ls-dot-pulse 3.18s ease-in-out infinite 1.95s; }
+.ls-dot:nth-child(22) { left: 35%; top: 52%; animation: ls-dot-pulse 2.82s ease-in-out infinite 2.18s; }
+.ls-dot:nth-child(23) { left: 52%; top: 28%; animation: ls-dot-pulse 3.38s ease-in-out infinite 2.41s; }
+.ls-dot:nth-child(24) { left:  2%; top: 92%; animation: ls-dot-pulse 2.68s ease-in-out infinite 2.64s; }
+
+@keyframes ls-dot-pulse {
+  0%, 100% { opacity: 0.12; transform: scale(1); }
+  50%       { opacity: 0.55; transform: scale(1.9); }
+}
+
+/* ── brand ─────────────────────────────────────────────────────── */
+.ls-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 52px;
+  user-select: none;
+}
+
+.ls-brand-text {
+  font-family: var(--font-brand);
+  font-size: clamp(2rem, 6vw, 3.6rem);
+  letter-spacing: 0.22em;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.ls-brand-sub {
+  font-family: var(--font-brand);
+  font-size: clamp(0.9rem, 2.2vw, 1.3rem);
+  letter-spacing: 0.3em;
+  color: rgba(255, 255, 255, 0.3);
+  line-height: 1;
+}
+
+/* ── big percentage counter ────────────────────────────────────── */
+.ls-counter {
+  display: flex;
+  align-items: flex-start;
+  line-height: 1;
+  margin-bottom: 28px;
+  user-select: none;
+}
+
+.ls-pct {
+  font-family: var(--font-brand);
+  font-size: clamp(5.5rem, 20vw, 13rem);
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  line-height: 0.9;
+  font-variant-numeric: tabular-nums;
+}
+
+.ls-pct-sym {
+  font-family: var(--font-brand);
+  font-size: clamp(1.8rem, 5.5vw, 4.2rem);
+  color: rgba(255, 255, 255, 0.28);
+  margin-top: 0.4em;
+  margin-left: 4px;
+  letter-spacing: 0;
+}
+
+/* ── progress bar ──────────────────────────────────────────────── */
+.ls-bar-track {
+  position: relative;
+  width: min(560px, 82vw);
+  height: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  margin-bottom: 22px;
+  overflow: visible;
+}
+
+.ls-bar-fill {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0.12) 0%, #ffffff 100%);
+  transition: width 0.07s linear;
+}
+
+.ls-bar-glow {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow:
+    0 0 6px  4px rgba(255, 255, 255, 0.5),
+    0 0 20px 8px rgba(255, 255, 255, 0.18);
+  transition: left 0.07s linear;
+  pointer-events: none;
+}
+
+/* ── status label ──────────────────────────────────────────────── */
+.ls-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+
+.ls-step-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  animation: ls-step-blink 0.9s ease-in-out infinite;
+}
+
+@keyframes ls-step-blink {
+  0%, 100% { opacity: 1;   transform: scale(1); }
+  50%       { opacity: 0.3; transform: scale(0.7); }
+}
+
+.ls-step-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.38);
+  text-transform: uppercase;
+  animation: ls-label-in 0.22s ease;
+}
+
+@keyframes ls-label-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
