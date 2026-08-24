@@ -23,7 +23,7 @@ function BootScreen() {
     );
   }, []);
   return (
-    <div className="boot" ref={ref} style={{ opacity: 0 }}>
+    <div className="boot" ref={ref}>
       SMARTER
     </div>
   );
@@ -43,7 +43,7 @@ function PageTransition({ page, children }) {
   }, [page]);
 
   return (
-    <div ref={ref} style={{ opacity: 0 }}>
+    <div ref={ref}>
       {children}
     </div>
   );

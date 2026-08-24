@@ -45,13 +45,11 @@ export default function Modal({ title, children, onClose, wide = false }) {
     <div
       ref={overlayRef}
       className="modal-overlay active"
-      style={{ opacity: 0 }}
       onMouseDown={(e) => e.target === e.currentTarget && handleClose()}
     >
       <section
         ref={contentRef}
         className={`modal-content ${wide ? "modal-content-wide" : ""}`}
-        style={{ opacity: 0 }}
       >
         <div className="view-modal-header">
           <h2>{title}</h2>

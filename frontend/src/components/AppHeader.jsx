@@ -40,7 +40,7 @@ export default function AppHeader({ user, page, setPage, logout, theme, toggleTh
   }, []);
 
   return (
-    <header ref={headerRef} className="navbar app-header" style={{ opacity: 0 }}>
+    <header ref={headerRef} className="navbar app-header">
       <button className="nav-brand" onClick={() => setPage("daily")}>
         <span className="nav-brand-text">SMARTER</span>
       </button>

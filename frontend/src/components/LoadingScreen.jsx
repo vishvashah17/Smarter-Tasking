@@ -167,13 +167,13 @@ export default function LoadingScreen({ onDone }) {
       </ul>
 
       {/* Brand */}
-      <div ref={brandRef} className="ls-brand" style={{ opacity: 0 }}>
+      <div ref={brandRef} className="ls-brand">
         <span className="ls-brand-text">SMARTER</span>
         <span className="ls-brand-sub">TASKING</span>
       </div>
 
       {/* Counter */}
-      <div ref={counterRef} className="ls-counter" style={{ opacity: 0 }}>
+      <div ref={counterRef} className="ls-counter">
         <span className="ls-pct">000</span>
         <span className="ls-pct-sym">%</span>
       </div>
@@ -185,7 +185,7 @@ export default function LoadingScreen({ onDone }) {
       </div>
 
       {/* Status label */}
-      <div className="ls-status" style={{ opacity: 0 }}>
+      <div className="ls-status">
         <span className="ls-step-dot" />
         <span ref={labelRef} className="ls-step-label">{labelText}</span>
       </div>
