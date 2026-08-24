@@ -17,7 +17,7 @@ export default function CollectionPage({
   deleteMessage,
   apiClient,
 }) {
-  const { cache, invalidate } = useAppData();
+  const { cache, optimisticUpdate } = useAppData();
   const [modal, setModal] = useState(null);
 
   // Read from shared cache — no local API call needed
@@ -25,20 +25,39 @@ export default function CollectionPage({
 
   async function save(item) {
     const editing = Boolean(item.id);
-    await apiClient(editing ? `${itemPath}/${item.id}` : itemPath, {
-      method: editing ? "PATCH" : "POST",
-      body: JSON.stringify(item),
-    });
     setModal(null);
     showFlash(editing ? updateMessage : createMessage);
-    invalidate(cacheKey);   // refresh this slice in cache
+
+    await optimisticUpdate(
+      cacheKey,
+      (prev) => {
+        const list = prev?.[listKey] ?? [];
+        if (editing) {
+          // patch existing item in-place
+          return { ...prev, [listKey]: list.map((i) => (i.id === item.id ? { ...i, ...item } : i)) };
+        }
+        // prepend a temporary new item
+        const tempItem = { ...item, id: `temp-${Date.now()}`, updated_at: new Date().toISOString(), _optimistic: true };
+        return { ...prev, [listKey]: [tempItem, ...list] };
+      },
+      () => apiClient(editing ? `${itemPath}/${item.id}` : itemPath, {
+        method: editing ? "PATCH" : "POST",
+        body: JSON.stringify(item),
+      }),
+      (err) => showFlash(`Failed to save: ${err.message}`)
+    );
   }
 
   async function remove(id) {
-    await apiClient(`${itemPath}/${id}`, { method: "DELETE" });
     setModal(null);
     showFlash(deleteMessage);
-    invalidate(cacheKey);
+
+    await optimisticUpdate(
+      cacheKey,
+      (prev) => ({ ...prev, [listKey]: (prev?.[listKey] ?? []).filter((i) => i.id !== id) }),
+      () => apiClient(`${itemPath}/${id}`, { method: "DELETE" }),
+      (err) => showFlash(`Failed to delete: ${err.message}`)
+    );
   }
 
   return (

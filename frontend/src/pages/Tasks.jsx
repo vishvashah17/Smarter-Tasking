@@ -4,7 +4,7 @@ import { useAppData } from "../context/AppDataContext.jsx";
 import { api } from "../services/api.js";
 
 export default function Tasks({ type, showFlash }) {
-  const { cache, invalidate } = useAppData();
+  const { cache, invalidate, optimisticUpdate } = useAppData();
   const cacheKey = type === "daily" ? "dailyTasks" : "periodicTasks";
 
   // Read tasks directly from the shared cache
@@ -15,27 +15,51 @@ export default function Tasks({ type, showFlash }) {
 
   async function createTask(event) {
     event.preventDefault();
-    await api("/api/tasks", {
-      method: "POST",
-      body: JSON.stringify({ ...form, type, deadline: form.deadline || null }),
-    });
-    setForm({ title: "", description: "", deadline: "" });
+    const newTask = {
+      id: `temp-${Date.now()}`,      // temporary id – replaced after server sync
+      ...form,
+      type,
+      deadline: form.deadline || null,
+      status: "active",
+      _optimistic: true,
+    };
     setModal(false);
+    setForm({ title: "", description: "", deadline: "" });
     showFlash("Task added.");
-    invalidate(cacheKey);           // refresh only this slice
+
+    await optimisticUpdate(
+      cacheKey,
+      (prev) => ({ ...prev, tasks: [newTask, ...(prev?.tasks ?? [])] }),
+      () => api("/api/tasks", {
+        method: "POST",
+        body: JSON.stringify({ ...form, type, deadline: form.deadline || null }),
+      }),
+      (err) => showFlash(`Failed to save task: ${err.message}`)
+    );
   }
 
   async function completeTask(id) {
-    await api(`/api/tasks/${id}/complete`, { method: "POST", body: "{}" });
     showFlash("Task completed.");
-    invalidate(cacheKey);
-    invalidate("history");          // history is now stale too
+
+    await optimisticUpdate(
+      cacheKey,
+      (prev) => ({ ...prev, tasks: (prev?.tasks ?? []).filter((t) => t.id !== id) }),
+      () => api(`/api/tasks/${id}/complete`, { method: "POST", body: "{}" }),
+      (err) => showFlash(`Failed to complete task: ${err.message}`)
+    );
+    // history slice is now stale regardless of rollback
+    invalidate("history");
   }
 
   async function deleteTask(id) {
-    await api(`/api/tasks/${id}`, { method: "DELETE" });
     showFlash("Task deleted.");
-    invalidate(cacheKey);
+
+    await optimisticUpdate(
+      cacheKey,
+      (prev) => ({ ...prev, tasks: (prev?.tasks ?? []).filter((t) => t.id !== id) }),
+      () => api(`/api/tasks/${id}`, { method: "DELETE" }),
+      (err) => showFlash(`Failed to delete task: ${err.message}`)
+    );
   }
 
   return (

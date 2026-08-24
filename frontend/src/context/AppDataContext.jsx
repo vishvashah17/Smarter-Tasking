@@ -79,6 +79,44 @@ export function AppDataProvider({ children }) {
   );
 
   /**
+   * Optimistically update a cache slice, fire the real API call in the
+   * background, then sync (invalidate) on success or rollback on failure.
+   *
+   * @param {string}   key        - Cache key (e.g. "dailyTasks", "notes")
+   * @param {function} updater    - Pure fn: (prevCacheSlice) => nextCacheSlice
+   * @param {function} apiFn     - Async fn that performs the real mutation
+   * @param {function} [onError] - Optional: (err) => void — shown to user
+   */
+  const optimisticUpdate = useCallback(
+    async (key, updater, apiFn, onError) => {
+      // 1. Snapshot current slice for rollback
+      setCache((prev) => {
+        const snapshot = prev[key];
+        // Store snapshot on the ref so the async closure can read it
+        inFlight.current[`__snap_${key}`] = snapshot;
+        return { ...prev, [key]: updater(snapshot) };
+      });
+
+      // 2. Fire real API in the background
+      try {
+        await apiFn();
+        // 3a. Success → sync cache from server to stay consistent
+        invalidate(key);
+      } catch (err) {
+        // 3b. Failure → rollback to snapshot
+        setCache((prev) => ({
+          ...prev,
+          [key]: inFlight.current[`__snap_${key}`],
+        }));
+        if (onError) onError(err);
+      } finally {
+        delete inFlight.current[`__snap_${key}`];
+      }
+    },
+    [invalidate]
+  );
+
+  /**
    * Invalidate history with custom filter params (used by the History page
    * when filter dropdowns change — still reads from cache for default view).
    */
@@ -99,6 +137,7 @@ export function AppDataProvider({ children }) {
         error,
         prefetchAll,
         invalidate,
+        optimisticUpdate,
         fetchHistoryWithFilters,
       }}
     >
