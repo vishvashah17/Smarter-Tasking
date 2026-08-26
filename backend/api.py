@@ -9,6 +9,11 @@ from models import CodeSnippet, Note, Task, User
 bp = Blueprint("api", __name__)
 
 
+@bp.route("/health")
+def health():
+    return jsonify({"name": "taskmanager-api", "status": "ok"})
+
+
 @bp.route("/<path:_path>", methods=["OPTIONS"])
 @bp.route("/", methods=["OPTIONS"])
 def options(_path=None):
