@@ -168,6 +168,7 @@ export default function LoadingScreen({ onDone }) {
 
       {/* Brand */}
       <div ref={brandRef} className="ls-brand">
+        <img className="brand-logo ls-logo" src="/weblogo.png" alt="" />
         <span className="ls-brand-text">SMARTER</span>
         <span className="ls-brand-sub">TASKING</span>
       </div>

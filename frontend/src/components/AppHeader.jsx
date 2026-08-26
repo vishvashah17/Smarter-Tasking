@@ -5,11 +5,11 @@ export default function AppHeader({ user, page, setPage, logout }) {
   const headerRef = useRef(null);
 
   const links = [
-    ["daily",    "Daily"],
+    ["daily", "Daily"],
     ["periodic", "Periodic"],
-    ["history",  "History"],
-    ["codes",    "Codes"],
-    ["notes",    "Notes"],
+    ["history", "History"],
+    ["codes", "Codes"],
+    ["notes", "Notes"],
   ];
 
   // ── Slide the whole header down once on first render ──────────────────────
@@ -41,8 +41,9 @@ export default function AppHeader({ user, page, setPage, logout }) {
 
   return (
     <header ref={headerRef} className="navbar app-header">
-      <button className="nav-brand" onClick={() => setPage("daily")}>
-          <span className="nav-brand-text">Smarter</span>
+      <button className="nav-brand" onClick={() => setPage("daily")} aria-label="Go to Daily tasks">
+        <img className="brand-logo brand-logo-nav" src="/weblogo.png" alt="" />
+        <span className="nav-brand-text">Smarter</span>
       </button>
       <nav className="nav-links">
         {links.map(([id, label]) => (

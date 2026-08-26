@@ -24,7 +24,8 @@ function BootScreen() {
   }, []);
   return (
     <div className="boot" ref={ref}>
-      SMARTER
+      <img className="brand-logo boot-logo" src="/weblogo.png" alt="SMARTER" />
+      <span>SMARTER</span>
     </div>
   );
 }

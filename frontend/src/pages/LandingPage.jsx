@@ -4,7 +4,8 @@ export default function LandingPage({ onLogin }) {
   return (
     <>
       <header className="landing-navbar">
-        <button className="landing-brand" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+        <button className="landing-brand" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="Back to top">
+          <img className="brand-logo brand-logo-nav" src="/weblogo.png" alt="" />
           <span className="nav-brand-text">SmarterTasking</span>
         </button>
         <nav className="landing-links">

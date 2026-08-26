@@ -26,6 +26,7 @@ export default function AuthView({ initialMode = "login", onLogin, onBack, showF
         <div className="auth-box">
           <button className="auth-back" type="button" onClick={onBack}>Back to overview</button>
           <div className="auth-header">
+            <img className="brand-logo auth-logo" src="/weblogo.png" alt="SmarterTasking" />
             <h1>{mode === "login" ? "Welcome back" : "Create account"}</h1>
             <p>{mode === "login" ? "Sign in to continue planning your work" : "Create your workspace and start organizing tasks"}</p>
           </div>
