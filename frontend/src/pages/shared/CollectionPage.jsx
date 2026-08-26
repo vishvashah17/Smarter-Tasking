@@ -102,7 +102,6 @@ export default function CollectionPage({
           tabIndex="0"
         >
           <div className="grid-card-add-inner">
-            <span className="grid-card-add-icon">+</span>
             <span className="grid-card-add-label">
               Add new {kind === "code" ? "Code Snippet" : "Note"}
             </span>

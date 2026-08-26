@@ -114,7 +114,6 @@ export default function Tasks({ type, showFlash }) {
       <ul ref={listRef} className="task-list">
         <li className="task-item task-item-add" onClick={() => setModal(true)} tabIndex="0">
           <div className="task-add-btn">
-            <span className="task-add-plus">+</span>
             <span>Add new {type === "daily" ? "daily task" : "periodic task"}...</span>
           </div>
         </li>
@@ -147,36 +146,54 @@ export default function Tasks({ type, showFlash }) {
 
       {modal && (
         <Modal
-          title={type === "daily" ? "New Task" : "New Periodic Task"}
+          title={type === "daily" ? "New Daily Task" : "New Periodic Task"}
+          icon={null}
+          sharp
           onClose={() => setModal(false)}
         >
-          <form onSubmit={createTask}>
-            <label>Title
+          <form onSubmit={createTask} className="modal-form">
+            <div className="form-group">
+              <label htmlFor="task-title" className="form-label">Task Title</label>
               <input
+                id="task-title"
+                className="form-input"
+                placeholder="What needs to be done?"
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
                 required
               />
-            </label>
-            <label>Notes
-              <input
+            </div>
+            <div className="form-group">
+              <label htmlFor="task-desc" className="form-label">Description / Notes</label>
+              <textarea
+                id="task-desc"
+                className="form-textarea"
+                placeholder="Add optional details or subtasks..."
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
+                rows={3}
               />
-            </label>
+            </div>
             {type === "periodic" && (
-              <label>Deadline
+              <div className="form-group">
+                <label htmlFor="task-deadline" className="form-label">Target Deadline</label>
                 <input
+                  id="task-deadline"
                   type="datetime-local"
+                  className="form-input"
                   value={form.deadline}
                   onChange={(e) => setForm({ ...form, deadline: e.target.value })}
                   required
                 />
-              </label>
+              </div>
             )}
             <div className="modal-actions">
-              <button type="button" className="btn-cancel" onClick={() => setModal(false)}>Cancel</button>
-              <button type="submit" className="btn-primary">Add task</button>
+              <button type="button" className="btn-cancel" onClick={() => setModal(false)}>
+                Cancel
+              </button>
+              <button type="submit" className="btn-primary">
+                Add Task
+              </button>
             </div>
           </form>
         </Modal>

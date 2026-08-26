@@ -3,7 +3,7 @@ import { shortDate } from "../../utils/date.js";
 
 export default function CollectionViewer({ kind, item, onClose, onEdit, onRemove }) {
   return (
-    <Modal title={item.title} wide onClose={onClose}>
+    <Modal title={item.title} wide icon={null} sharp onClose={onClose}>
       <div className="view-modal-meta">
         Updated {shortDate(item.updated_at)}
         {item.created_at !== item.updated_at ? ` - Created ${shortDate(item.created_at)}` : ""}
