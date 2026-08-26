@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 
-export default function AppHeader({ user, page, setPage, logout, theme, toggleTheme }) {
+export default function AppHeader({ user, page, setPage, logout }) {
   const headerRef = useRef(null);
 
   const links = [
@@ -42,7 +42,7 @@ export default function AppHeader({ user, page, setPage, logout, theme, toggleTh
   return (
     <header ref={headerRef} className="navbar app-header">
       <button className="nav-brand" onClick={() => setPage("daily")}>
-        <span className="nav-brand-text">SMARTER</span>
+          <span className="nav-brand-text">Smarter</span>
       </button>
       <nav className="nav-links">
         {links.map(([id, label]) => (
@@ -52,14 +52,6 @@ export default function AppHeader({ user, page, setPage, logout, theme, toggleTh
         ))}
       </nav>
       <div className="nav-user">
-        <button
-          className="theme-toggle nav-block-btn"
-          onClick={toggleTheme}
-          title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
-          aria-label="Toggle dark mode"
-        >
-          {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
-        </button>
         <button
           className={`username nav-block-btn ${page === "profile" ? "active" : ""}`}
           onClick={() => setPage("profile")}

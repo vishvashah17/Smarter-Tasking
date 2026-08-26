@@ -50,7 +50,7 @@ function PageTransition({ page, children }) {
 }
 
 // ─── Inner app (has access to AppDataContext) ─────────────────────────────────
-function AppInner({ user, page, setPage, logout, theme, toggleTheme, flash, showFlash }) {
+function AppInner({ user, page, setPage, logout, flash, showFlash }) {
   const { loading, error, prefetchAll } = useAppData();
 
   useEffect(() => {
@@ -80,8 +80,6 @@ function AppInner({ user, page, setPage, logout, theme, toggleTheme, flash, show
         page={page}
         setPage={setPage}
         logout={logout}
-        theme={theme}
-        toggleTheme={toggleTheme}
       />
       <main
         className={`container ${["history", "codes", "notes"].includes(page) ? "container-grid" : ""
@@ -108,18 +106,11 @@ export default function App() {
   const [page, setPage] = useState("landing");
   const [authMode, setAuthMode] = useState("login");
   const [flash, setFlash] = useState(null);
-  const [theme, setTheme] = useState(
-    () => localStorage.getItem("theme") || "light"
-  );
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  function toggleTheme() {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  }
+    document.documentElement.removeAttribute("data-theme");
+    localStorage.removeItem("theme");
+  }, []);
 
   useEffect(() => {
     api("/api/auth/me")
@@ -171,8 +162,6 @@ export default function App() {
         page={page}
         setPage={setPage}
         logout={logout}
-        theme={theme}
-        toggleTheme={toggleTheme}
         flash={flash}
         showFlash={showFlash}
       />
